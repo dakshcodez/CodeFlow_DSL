@@ -29,8 +29,8 @@ function printSymbolTables(symbolTables: SymbolTable[]): void {
   }
 }
 
-function printIR(ir: WorkflowIR[]): void {
-  console.log(`\n-- Three-Address Code (${ir.length} workflow(s)) --`);
+function printIR(heading: string, ir: WorkflowIR[]): void {
+  console.log(`\n-- ${heading} (${ir.length} workflow(s)) --`);
   for (const workflowIR of ir) {
     console.log(formatWorkflowIR(workflowIR));
   }
@@ -45,7 +45,7 @@ function main(): void {
   }
 
   const source = readFileSync(filePath, "utf-8");
-  const { tokens, program, symbolTables, ir, errors } = compile(source);
+  const { tokens, program, symbolTables, ir, optimizedIR, errors } = compile(source);
 
   printTokens(tokens);
 
@@ -53,7 +53,8 @@ function main(): void {
   console.log(JSON.stringify(program, null, 2));
 
   printSymbolTables(symbolTables);
-  printIR(ir);
+  printIR("Three-Address Code", ir);
+  printIR("Optimized Three-Address Code", optimizedIR);
 
   if (errors.length > 0) {
     console.log(`\n-- Errors (${errors.length}) --`);
