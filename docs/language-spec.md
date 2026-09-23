@@ -431,3 +431,29 @@ Section 12 and TAC generation in Section 13. Phase 3 adds the
 optimization passes in Section 14 and the execution engine in Section 15,
 completing the pipeline described in `CLAUDE.md` and the Phase 1
 proposal.
+
+## 17. Definition of Done
+
+Per `CLAUDE.md` §31, a complete CodeFlow program is one that is lexed,
+parsed, AST-constructed, semantically validated, symbol-table populated,
+TAC-generated, TAC-optimized, executed, and produces a result/trace, with
+errors reported consistently and every artifact visible in the UI. All
+of these are implemented and covered by tests:
+
+| Checkpoint | Module | Tests |
+|---|---|---|
+| Lexed | `src/lexer/lexer.ts` | `tests/lexer/` |
+| Parsed / AST constructed | `src/parser/parser.ts`, `src/ast/nodes.ts` | `tests/parser/` |
+| Semantically validated | `src/semantic/analyzer.ts` | `tests/semantic/` |
+| Symbol table populated | `src/symbols/symbolTable.ts` | `tests/symbols/` |
+| TAC generated | `src/ir/generator.ts` | `tests/ir/` |
+| TAC optimized | `src/optimizer/optimizer.ts` | `tests/optimizer/` |
+| Optimized TAC executed / result produced | `src/runtime/interpreter.ts` | `tests/runtime/` |
+| Errors reported consistently | `src/diagnostics/diagnostics.ts` (one `CompilerError` shape across all four stages) | exercised throughout |
+| Artifacts visible in the UI | `web/app.ts` (source, inputs, tokens, AST, symbol table, TAC, optimized TAC, errors, execution trace) | `tests/web/` |
+
+`src/compiler/pipeline.ts` ties every stage together as `compile()`
+(static analysis through optimized TAC) and `run()` (`compile()` plus
+execution), and `tests/e2e/pipeline.test.ts` exercises the whole chain
+end-to-end for both the canonical and the intentionally malformed
+example programs in `examples/`.
