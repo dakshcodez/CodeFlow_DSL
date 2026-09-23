@@ -283,11 +283,89 @@ LABEL L1
 LABEL L2
 ```
 
-## 14. Phase Scope
+## 14. Optimization (Phase 3)
+
+`src/optimizer/optimizer.ts` applies the three feasible optimizations
+CLAUDE.md §16 scopes for this DSL, each an independently-testable pure
+function `IRInstruction[] → IRInstruction[]`, run in this order by
+`optimizeWorkflow`:
+
+1. **Constant folding** (`foldConstants`) — evaluates `Binary`/`Unary`
+   instructions whose operands are compile-time constants into a single
+   `Assign`. Constant knowledge is tracked per temporary and reset at
+   every `Label` (a control-flow merge point). Division by a constant
+   zero is deliberately left unfolded, so the future execution engine's
+   runtime-error handling applies uniformly rather than the optimizer
+   producing `Infinity`/`NaN` as a "constant."
+2. **Unreachable-code elimination** (`eliminateUnreachableCode`) — builds
+   a small control-flow graph over instruction indices (fallthrough to
+   `i + 1`, plus jump edges for `Goto`/`IfFalse`) and keeps only what a
+   breadth-first search from the first instruction reaches. When an
+   `IfFalse`'s condition is a compile-time-known boolean (typically
+   because constant folding ran first), only the one edge that condition
+   can actually take is included — this is what lets an always-true or
+   always-false `when` eliminate its unreachable branch, without the
+   pass needing to special-case CodeFlow's specific statement forms.
+3. **Dead-code elimination** (`eliminateDeadCode`) — a single backward
+   pass removes any `Assign`/`Binary`/`Unary` instruction whose result
+   temporary is never used later. One pass (not an iterative fixed
+   point) is sufficient because CodeFlow has no loops: every jump target
+   is textually later than its jump, so the reverse instruction order is
+   already a valid reverse-topological order, and each temporary has
+   exactly one static definition.
+
+Passes run in this order — fold, then prune unreachable branches, then
+remove now-dead definitions — because each pass can create new
+opportunities for the next (folding a sub-expression to a constant can
+leave its operand temporaries unused; eliminating an unreachable branch
+removes the only uses some temporaries had).
+
+### Example
+
+```
+workflow "T" { when 10 > 5 { alert "always" } otherwise { log "never" } }
+```
+
+lowers to:
+
+```
+workflow "T":
+    t1 = 10
+    t2 = 5
+    t3 = t1 > t2
+    IF_FALSE t3 GOTO L1
+    ALERT "always"
+    GOTO L2
+LABEL L1
+    LOG "never"
+LABEL L2
+```
+
+and optimizes to:
+
+```
+workflow "T":
+    t3 = true
+    IF_FALSE t3 GOTO L1
+    ALERT "always"
+    GOTO L2
+LABEL L2
+```
+
+`10 > 5` folds to the constant `true` (`t3 = true`); the now-unused
+`t1 = 10` and `t2 = 5` are removed by dead-code elimination since
+nothing references them once `t3` names its value directly; and the
+`otherwise` branch (`LABEL L1` / `LOG "never"`) becomes unreachable and
+is removed. See `tests/optimizer/optimizer.test.ts` for further worked
+examples, including `x + (1 + 2)`, where dead-code elimination removes
+the now-unused temporaries for the literals `1` and `2` once their sum
+folds to `3`.
+
+## 15. Phase Scope
 
 This specification covers the full CodeFlow grammar. Phase 1 implements
 lexical analysis and recursive-descent parsing, producing a preliminary
 AST with basic syntax-error reporting. Phase 2 adds the semantic rules in
-Section 12 and TAC generation in Section 13 above. Optimization and
-execution are scoped for Phase 3, per `CLAUDE.md` and the Phase 1
-proposal.
+Section 12 and TAC generation in Section 13. Phase 3 adds the
+optimization passes in Section 14; execution is the remaining scope, per
+`CLAUDE.md` and the Phase 1 proposal.
