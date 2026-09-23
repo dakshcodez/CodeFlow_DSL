@@ -1,0 +1,9 @@
+// Expected diagnostic (Phase 2 semantic analysis): 'boolean + number' is not a valid operation.
+// Syntactically valid in Phase 1, since type checking is not yet implemented.
+workflow "Test" {
+    input active : boolean
+
+    when active + 5 {
+        log "Invalid"
+    }
+}

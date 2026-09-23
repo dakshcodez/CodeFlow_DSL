@@ -1,0 +1,5 @@
+// Expected diagnostic (Phase 1 lexical analysis): illegal character '@'.
+workflow "Test" {
+    input temperature : number
+    @
+}

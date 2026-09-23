@@ -1,0 +1,7 @@
+// Expected diagnostic (Phase 2 semantic analysis): undefined identifier 'temperature'.
+// Syntactically valid in Phase 1, since declaration/scope checking is not yet implemented.
+workflow "Test" {
+    when temperature > 30 {
+        log "Hot"
+    }
+}

@@ -1,0 +1,6 @@
+// Expected diagnostic (Phase 1 syntax analysis): missing closing brace(s).
+workflow "Test" {
+    input temperature : number
+
+    when temperature > 30 {
+        alert "Hot"
