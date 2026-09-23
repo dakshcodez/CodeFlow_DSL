@@ -1,6 +1,8 @@
 import { compile } from "../src/compiler/pipeline.js";
 import { formatCompilerError } from "../src/diagnostics/diagnostics.js";
 import type { SymbolTable } from "../src/symbols/symbolTable.js";
+import type { WorkflowIR } from "../src/ir/instructions.js";
+import { formatWorkflowIR } from "../src/ir/print.js";
 
 const DEFAULT_SOURCE = `workflow "CoolingSystem" {
     sensor temperature : number
@@ -64,6 +66,17 @@ function renderSymbolTables(container: HTMLElement, symbolTables: SymbolTable[])
   container.replaceChildren(...sections);
 }
 
+function renderIR(container: HTMLElement, ir: WorkflowIR[]): void {
+  if (ir.length === 0) {
+    container.innerHTML = `<p>No workflows.</p>`;
+    return;
+  }
+  const pre = document.createElement("pre");
+  pre.className = "output";
+  pre.textContent = ir.map(formatWorkflowIR).join("\n\n");
+  container.replaceChildren(pre);
+}
+
 function renderErrors(container: HTMLElement, errors: ReturnType<typeof compile>["errors"]): void {
   if (errors.length === 0) {
     container.innerHTML = `<p class="no-errors">No lexical, syntax, or semantic errors.</p>`;
@@ -83,12 +96,14 @@ function runCompile(): void {
   const tokensOutput = document.getElementById("tokens-output")!;
   const astOutput = document.getElementById("ast-output")!;
   const symbolsOutput = document.getElementById("symbols-output")!;
+  const irOutput = document.getElementById("ir-output")!;
   const errorsOutput = document.getElementById("errors-output")!;
 
-  const { tokens, program, symbolTables, errors } = compile(sourceEl.value);
+  const { tokens, program, symbolTables, ir, errors } = compile(sourceEl.value);
   renderTokens(tokensOutput, tokens);
   astOutput.textContent = JSON.stringify(program, null, 2);
   renderSymbolTables(symbolsOutput, symbolTables);
+  renderIR(irOutput, ir);
   renderErrors(errorsOutput, errors);
 }
 

@@ -10,9 +10,10 @@
   <header>
     <h1>CodeFlow Compiler Explorer</h1>
     <p class="subtitle">
-      Phase 2 &mdash; lexical analysis, recursive-descent parsing, and semantic
-      analysis (scope and type checking over a symbol table). IR generation,
-      optimization, and execution are planned for Phase 3.
+      Phase 2 &mdash; lexical analysis, recursive-descent parsing, semantic
+      analysis (scope and type checking over a symbol table), and
+      Three-Address Code generation. Optimization and execution are
+      planned for Phase 3.
     </p>
   </header>
 
@@ -36,6 +37,11 @@
     <section class="panel">
       <h2>Symbol Table</h2>
       <div id="symbols-output" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Three-Address Code</h2>
+      <div id="ir-output" class="output"></div>
     </section>
 
     <section class="panel">

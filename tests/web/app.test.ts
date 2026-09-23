@@ -8,6 +8,7 @@ function setupDom(): void {
     <div id="tokens-output"></div>
     <pre id="ast-output"></pre>
     <div id="symbols-output"></div>
+    <div id="ir-output"></div>
     <div id="errors-output"></div>
   `;
 }
@@ -24,6 +25,7 @@ describe("web visualization app", () => {
     const tokensOutput = document.getElementById("tokens-output")!;
     const astOutput = document.getElementById("ast-output")!;
     const symbolsOutput = document.getElementById("symbols-output")!;
+    const irOutput = document.getElementById("ir-output")!;
     const errorsOutput = document.getElementById("errors-output")!;
 
     expect(tokensOutput.querySelectorAll("tbody tr").length).toBeGreaterThan(0);
@@ -31,6 +33,8 @@ describe("web visualization app", () => {
     expect(astOutput.textContent).toContain("CoolingSystem");
     expect(symbolsOutput.textContent).toContain("CoolingSystem");
     expect(symbolsOutput.textContent).toContain("temperature");
+    expect(irOutput.textContent).toContain("t1 = temperature");
+    expect(irOutput.textContent).toContain("IF_FALSE t3 GOTO L1");
     expect(errorsOutput.querySelector(".no-errors")).not.toBeNull();
   });
 
