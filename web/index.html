@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeFlow Compiler Explorer</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <h1>CodeFlow Compiler Explorer</h1>
+    <p class="subtitle">
+      Phase 1 prototype &mdash; lexical analysis and recursive-descent parsing only.
+      Semantic analysis, IR generation, optimization, and execution are planned for
+      Phases 2 and 3.
+    </p>
+  </header>
+
+  <main>
+    <section class="panel source-panel">
+      <h2>Source</h2>
+      <textarea id="source" spellcheck="false"></textarea>
+      <button id="compile-btn">Compile</button>
+    </section>
+
+    <section class="panel">
+      <h2>Tokens</h2>
+      <div id="tokens-output" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Abstract Syntax Tree</h2>
+      <pre id="ast-output" class="output"></pre>
+    </section>
+
+    <section class="panel">
+      <h2>Errors</h2>
+      <div id="errors-output" class="output"></div>
+    </section>
+  </main>
+
+  <script src="./dist/app.js" defer></script>
+</body>
+</html>
