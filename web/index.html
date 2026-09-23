@@ -10,10 +10,11 @@
   <header>
     <h1>CodeFlow Compiler Explorer</h1>
     <p class="subtitle">
-      Phase 2 &mdash; lexical analysis, recursive-descent parsing, semantic
-      analysis (scope and type checking over a symbol table), and
-      Three-Address Code generation. Optimization and execution are
-      planned for Phase 3.
+      Phase 3 (in progress) &mdash; lexical analysis, recursive-descent
+      parsing, semantic analysis (scope and type checking over a symbol
+      table), Three-Address Code generation, and optimization (constant
+      folding, unreachable- and dead-code elimination). Execution is
+      planned next.
     </p>
   </header>
 
@@ -42,6 +43,11 @@
     <section class="panel">
       <h2>Three-Address Code</h2>
       <div id="ir-output" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Optimized Three-Address Code</h2>
+      <div id="optimized-ir-output" class="output"></div>
     </section>
 
     <section class="panel">

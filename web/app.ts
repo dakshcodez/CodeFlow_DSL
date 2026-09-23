@@ -97,13 +97,15 @@ function runCompile(): void {
   const astOutput = document.getElementById("ast-output")!;
   const symbolsOutput = document.getElementById("symbols-output")!;
   const irOutput = document.getElementById("ir-output")!;
+  const optimizedIrOutput = document.getElementById("optimized-ir-output")!;
   const errorsOutput = document.getElementById("errors-output")!;
 
-  const { tokens, program, symbolTables, ir, errors } = compile(sourceEl.value);
+  const { tokens, program, symbolTables, ir, optimizedIR, errors } = compile(sourceEl.value);
   renderTokens(tokensOutput, tokens);
   astOutput.textContent = JSON.stringify(program, null, 2);
   renderSymbolTables(symbolsOutput, symbolTables);
   renderIR(irOutput, ir);
+  renderIR(optimizedIrOutput, optimizedIR);
   renderErrors(errorsOutput, errors);
 }
 
