@@ -1,0 +1,20 @@
+{
+  "name": "codeflow",
+  "version": "0.1.0",
+  "description": "CodeFlow -- A Domain-Specific Language and Compiler for Workflow Automation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "compile": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build:web": "esbuild web/app.ts --bundle --outfile=web/dist/app.js --format=iife"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.0"
+  }
+}
