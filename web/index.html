@@ -10,11 +10,11 @@
   <header>
     <h1>CodeFlow Compiler Explorer</h1>
     <p class="subtitle">
-      Phase 3 (in progress) &mdash; lexical analysis, recursive-descent
-      parsing, semantic analysis (scope and type checking over a symbol
-      table), Three-Address Code generation, and optimization (constant
-      folding, unreachable- and dead-code elimination). Execution is
-      planned next.
+      Phase 3 &mdash; lexical analysis, recursive-descent parsing, semantic
+      analysis (scope and type checking over a symbol table), Three-Address
+      Code generation, optimization (constant folding, unreachable- and
+      dead-code elimination), and execution against runtime sensor/input
+      values you supply below.
     </p>
   </header>
 
@@ -23,6 +23,12 @@
       <h2>Source</h2>
       <textarea id="source" spellcheck="false"></textarea>
       <button id="compile-btn">Compile</button>
+    </section>
+
+    <section class="panel source-panel">
+      <h2>Runtime Inputs (JSON)</h2>
+      <textarea id="inputs" spellcheck="false" class="inputs-textarea"></textarea>
+      <button id="run-btn">Run</button>
     </section>
 
     <section class="panel">
@@ -53,6 +59,11 @@
     <section class="panel">
       <h2>Errors</h2>
       <div id="errors-output" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Execution Trace</h2>
+      <div id="execution-output" class="output"></div>
     </section>
   </main>
 

@@ -60,7 +60,17 @@ textarea#source {
   resize: vertical;
 }
 
-button#compile-btn {
+textarea.inputs-textarea {
+  width: 100%;
+  height: 90px;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  resize: vertical;
+}
+
+button#compile-btn,
+button#run-btn {
   margin-top: 0.75rem;
   padding: 0.5rem 1.25rem;
   font-size: 1rem;
