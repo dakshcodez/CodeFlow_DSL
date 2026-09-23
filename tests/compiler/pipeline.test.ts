@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { compile } from "../../src/compiler/pipeline.js";
+import { formatInstruction } from "../../src/ir/print.js";
 
 function loadExample(relativePath: string): string {
   return readFileSync(new URL(`../../examples/${relativePath}`, import.meta.url), "utf-8");
@@ -48,6 +49,24 @@ describe("compile pipeline", () => {
     expect(symbolTables).toHaveLength(1);
     expect(symbolTables[0]!.symbols).toEqual([
       expect.objectContaining({ name: "temperature", kind: "sensor", type: "number" }),
+    ]);
+  });
+
+  it("generates TAC for the canonical cooling-system example", () => {
+    const { ir } = compile(loadExample("cooling.cflow"));
+    expect(ir).toHaveLength(1);
+    expect(ir[0]!.workflowName).toBe("CoolingSystem");
+    expect(ir[0]!.instructions.map(formatInstruction)).toEqual([
+      "t1 = temperature",
+      "t2 = 35",
+      "t3 = t1 > t2",
+      "IF_FALSE t3 GOTO L1",
+      'ALERT "High temperature"',
+      "CALL start_fan()",
+      "GOTO L2",
+      "LABEL L1",
+      'LOG "Temperature normal"',
+      "LABEL L2",
     ]);
   });
 });
