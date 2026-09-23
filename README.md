@@ -18,22 +18,23 @@ for the original Phase 1 proposal and design document.
 ## Project Status: Phase 2 (in progress, branch `phase2`)
 
 Phase 1 (Problem Definition & System Design) is complete. Phase 2 (Core
-Compiler Construction) adds semantic analysis and the symbol table on
-top of it. The compiler currently performs:
+Compiler Construction) adds semantic analysis, the symbol table, and TAC
+generation on top of it. The compiler currently performs:
 
 ```
 Source (.cflow) → Lexer → Token List → Recursive-Descent Parser → AST
                 → Semantic Analyzer (scope + type checking, symbol table)
+                → Three-Address Code Generator
 ```
 
-TAC generation, optimization, and execution are **not yet implemented**
-— they are planned for Phase 3 (see `CLAUDE.md` §20).
+Optimization and execution are **not yet implemented** — they are
+planned for Phase 3 (see `CLAUDE.md` §20).
 
 ## Getting Started
 
 ```bash
 npm install
-npm test           # run the test suite (lexer, parser, symbols, semantic, pipeline, web UI)
+npm test           # run the test suite (lexer, parser, symbols, semantic, ir, pipeline, web UI)
 npm run typecheck   # type-check src/, web/, and tests/ with no emit
 npm run build       # compile src/ to dist/
 ```
@@ -45,7 +46,8 @@ npm run compile -- examples/cooling.cflow
 ```
 
 Prints the token stream, the resulting AST as JSON, the per-workflow
-symbol tables, and any lexical, syntax, or semantic errors.
+symbol tables, the generated Three-Address Code, and any lexical,
+syntax, or semantic errors.
 
 ### Browser visualization
 
@@ -55,7 +57,7 @@ python3 -m http.server 8000 --directory web   # or any static file server
 ```
 
 Open `web/index.html` to edit CodeFlow source and inspect the generated
-tokens, AST, and symbol table interactively.
+tokens, AST, symbol table, and Three-Address Code interactively.
 
 ## Repository Layout
 
@@ -67,9 +69,10 @@ src/
   parser/        Recursive-descent parser
   symbols/       Per-workflow symbol table
   semantic/      Semantic analyzer (scope + type checking)
-  compiler/      Pipeline wiring (lexer + parser + semantic analyzer)
+  ir/            TAC instruction types, generator, and printer
+  compiler/      Pipeline wiring (lexer + parser + semantic analyzer + IR)
   cli.ts         Console entry point
-web/             Lightweight browser visualization (tokens + AST + symbols)
+web/             Lightweight browser visualization (tokens/AST/symbols/IR)
 tests/           Unit and regression tests, mirroring src/ structure
 examples/        Canonical and intentionally malformed .cflow programs
 docs/            Language specification and the Phase 1 proposal PDF
