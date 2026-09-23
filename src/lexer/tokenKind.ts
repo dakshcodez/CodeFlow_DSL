@@ -1,0 +1,61 @@
+export type TokenKind =
+  // Keywords
+  | "Workflow"
+  | "Sensor"
+  | "Input"
+  | "When"
+  | "Otherwise"
+  | "Action"
+  | "Alert"
+  | "Log"
+  | "NumberType"
+  | "StringType"
+  | "BooleanType"
+  | "And"
+  | "Or"
+  | "Not"
+  | "True"
+  | "False"
+  // Literals and identifiers
+  | "Identifier"
+  | "NumberLiteral"
+  | "StringLiteral"
+  // Operators
+  | "Plus"
+  | "Minus"
+  | "Star"
+  | "Slash"
+  | "Greater"
+  | "Less"
+  | "GreaterEqual"
+  | "LessEqual"
+  | "EqualEqual"
+  | "BangEqual"
+  // Delimiters
+  | "LBrace"
+  | "RBrace"
+  | "LParen"
+  | "RParen"
+  | "Colon"
+  | "Comma"
+  // Control
+  | "EOF";
+
+export const KEYWORDS: ReadonlyMap<string, TokenKind> = new Map([
+  ["workflow", "Workflow"],
+  ["sensor", "Sensor"],
+  ["input", "Input"],
+  ["when", "When"],
+  ["otherwise", "Otherwise"],
+  ["action", "Action"],
+  ["alert", "Alert"],
+  ["log", "Log"],
+  ["number", "NumberType"],
+  ["string", "StringType"],
+  ["boolean", "BooleanType"],
+  ["AND", "And"],
+  ["OR", "Or"],
+  ["NOT", "Not"],
+  ["true", "True"],
+  ["false", "False"],
+]);
