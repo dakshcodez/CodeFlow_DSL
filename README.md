@@ -15,12 +15,10 @@ formal language specification, and
 [`docs/CodeFlow_Phase1_Proposal.pdf`](./docs/CodeFlow_Phase1_Proposal.pdf)
 for the original Phase 1 proposal and design document.
 
-## Project Status: Phase 3 (in progress, branch `phase3`)
+## Project Status: Phase 3 complete (branch `phase3`)
 
-Phase 1 (Problem Definition & System Design) and Phase 2 (Core Compiler
-Construction — semantic analysis, symbol table, TAC generation) are
-complete. Phase 3 (Optimization, Execution & Integration) has added the
-optimizer and the execution engine, completing the full pipeline:
+All three phases of the roadmap in `CLAUDE.md` §20 are implemented. The
+compiler runs the complete pipeline end-to-end:
 
 ```
 Source (.cflow) → Lexer → Token List → Recursive-Descent Parser → AST
@@ -28,16 +26,31 @@ Source (.cflow) → Lexer → Token List → Recursive-Descent Parser → AST
                 → Three-Address Code Generator
                 → Optimizer (constant folding, unreachable/dead-code elimination)
                 → Execution Engine (runs against user-supplied sensor/input values)
+                → Execution Result / Trace
 ```
 
-Remaining Phase 3 work per `CLAUDE.md` §20: comprehensive end-to-end
-regression testing and final documentation polish.
+- **Phase 1** — lexer, recursive-descent parser, preliminary AST, basic
+  syntax validation.
+- **Phase 2** — full semantic analyzer (declaration/scope/type checking),
+  per-workflow symbol table, Three-Address Code generation.
+- **Phase 3** — constant folding, unreachable- and dead-code elimination
+  (each independently testable and verified against before/after IR),
+  a TAC-interpreting execution engine with runtime error handling, a
+  complete browser visualization covering every artifact (tokens → AST →
+  symbol table → TAC → optimized TAC → execution trace), and end-to-end
+  regression tests (`tests/e2e/`) covering the full `source → execution`
+  pipeline for both representative and intentionally malformed programs.
+
+Every artifact-producing stage is unit-tested independently, and
+`compiler/pipeline.ts` exposes both `compile()` (static analysis through
+optimized TAC) and `run()` (`compile()` plus execution against supplied
+runtime inputs) as its public API.
 
 ## Getting Started
 
 ```bash
 npm install
-npm test           # run the test suite (lexer, parser, symbols, semantic, ir, optimizer, runtime, pipeline, web UI)
+npm test           # run the test suite (lexer, parser, symbols, semantic, ir, optimizer, runtime, pipeline, e2e, web UI)
 npm run typecheck   # type-check src/, web/, and tests/ with no emit
 npm run build       # compile src/ to dist/
 ```
@@ -82,7 +95,8 @@ src/
   compiler/      Pipeline wiring (lexer + parser + semantic + IR + optimizer)
   cli.ts         Console entry point
 web/             Lightweight browser visualization (tokens/AST/symbols/IR/trace)
-tests/           Unit and regression tests, mirroring src/ structure
+tests/           Unit tests mirroring src/ structure, plus tests/e2e/ for
+                 full source-to-execution pipeline regression tests
 examples/        Canonical and intentionally malformed .cflow programs
 docs/            Language specification and the Phase 1 proposal PDF
 ```
