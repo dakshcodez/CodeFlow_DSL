@@ -231,10 +231,63 @@ identifier: `name`, `kind` (`sensor` | `input`), `type`, and `scope`
 `has`, and one table instance is created per workflow by the semantic
 analyzer (`src/semantic/analyzer.ts`).
 
-## 13. Phase Scope
+## 13. Three-Address Code (Phase 2)
+
+`src/ir/generator.ts` lowers the AST into Three-Address Code (TAC), one
+independently-numbered instruction sequence per workflow (workflows do
+not call one another, so nothing is shared across them). The instruction
+set (`src/ir/instructions.ts`) follows CLAUDE.md §15:
+
+```
+Assign | Binary | Unary | IfFalse (conditional jump) | Goto | Label | Call | Alert | Log
+```
+
+An operand is one of: a compiler-generated temporary (`t1`, `t2`, ...), a
+named sensor/input variable, or a constant. `LiteralExpr` and
+`IdentifierExpr` are always first materialized into a fresh temporary via
+an `Assign` instruction — this keeps every downstream instruction to "at
+most one operator," matching true three-address discipline and the
+worked example in CLAUDE.md §15 (`t1 = temperature`, `t2 = 35`,
+`t3 = t1 > t2`).
+
+### Control flow lowering
+
+- `when COND { BODY }` alone lowers to: evaluate `COND` into a temp,
+  `IF_FALSE temp GOTO Lend`, `BODY`, `LABEL Lend`.
+- `when COND { BODY } otherwise { ELSE }` — when an `otherwise`
+  statement directly follows a `when` statement in the same statement
+  list — lowers to a standard if/else: `IF_FALSE temp GOTO Lelse`,
+  `BODY`, `GOTO Lend`, `LABEL Lelse`, `ELSE`, `LABEL Lend`. The explicit
+  `GOTO Lend` after `BODY` is required so the `when` branch does not fall
+  through into the `otherwise` branch.
+- An `otherwise` statement that does **not** directly follow a `when`
+  (the grammar allows this, since `when`/`otherwise` are independent
+  statement alternatives) has no condition to fall back on, so its body
+  is generated unconditionally.
+
+### Example
+
+The canonical cooling-system program (§11) lowers to:
+
+```
+workflow "CoolingSystem":
+    t1 = temperature
+    t2 = 35
+    t3 = t1 > t2
+    IF_FALSE t3 GOTO L1
+    ALERT "High temperature"
+    CALL start_fan()
+    GOTO L2
+LABEL L1
+    LOG "Temperature normal"
+LABEL L2
+```
+
+## 14. Phase Scope
 
 This specification covers the full CodeFlow grammar. Phase 1 implements
 lexical analysis and recursive-descent parsing, producing a preliminary
-AST with basic syntax-error reporting. Phase 2 adds the semantic rules
-in Section 12 above. TAC generation, optimization, and execution are
-scoped for Phase 3, per `CLAUDE.md` and the Phase 1 proposal.
+AST with basic syntax-error reporting. Phase 2 adds the semantic rules in
+Section 12 and TAC generation in Section 13 above. Optimization and
+execution are scoped for Phase 3, per `CLAUDE.md` and the Phase 1
+proposal.
