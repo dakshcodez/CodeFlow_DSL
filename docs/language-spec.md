@@ -182,11 +182,59 @@ workflow "OrderProcessing" {
 }
 ```
 
-## 12. Phase 1 Scope
+## 12. Semantic Rules (Phase 2)
 
-This specification covers the full CodeFlow grammar. The Phase 1
-prototype implements lexical analysis and recursive-descent parsing over
-this grammar, producing a preliminary AST with basic syntax-error
-reporting. Semantic analysis (declaration/scope/type checking), TAC
-generation, optimization, and execution are scoped for Phases 2 and 3
-respectively, per `CLAUDE.md` and the Phase 1 proposal.
+Semantic analysis walks the AST produced by the parser and enforces
+properties the context-free grammar above cannot express. A workflow is
+the scope boundary: each workflow gets its own symbol table, and
+identifiers declared in one workflow are not visible in another.
+
+### Declaration and scope checking
+
+- Every identifier referenced in a condition or action argument must
+  have been declared with `sensor` or `input` in its enclosing workflow.
+  Referencing an undeclared identifier is a semantic error
+  (`Undefined identifier 'x'`).
+- `sensor` and `input` declarations share one namespace per workflow;
+  declaring the same name twice in a workflow (regardless of whether
+  both are `sensor`, both `input`, or one of each) is a semantic error
+  (`Duplicate declaration of 'x' in workflow "W"`).
+- Action names (`action foo(...)`) are external dispatch targets, not
+  declarations, and are not looked up in the symbol table.
+
+### Type checking
+
+CodeFlow's three primitive types (`number`, `string`, `boolean`) are
+checked per operator category:
+
+| Operators             | Required operand types      | Result type |
+|------------------------|-------------------------------|--------------|
+| `+ - * /`               | `number, number`               | `number`     |
+| `> < >= <=`             | `number, number`                | `boolean`    |
+| `== !=`                 | two operands of the same type | `boolean`    |
+| `AND OR`                | `boolean, boolean`              | `boolean`    |
+| unary `-`                | `number`                        | `number`     |
+| `NOT`                    | `boolean`                       | `boolean`    |
+
+The condition of a `when` statement must itself have type `boolean`.
+
+When an operand's own type could not be resolved (because it already
+produced a semantic error, such as an undefined identifier), no further
+type error is reported for the expression containing it, to avoid
+cascading diagnostics for a single root cause.
+
+### Symbol table
+
+The symbol table (`src/symbols/symbolTable.ts`) records, per declared
+identifier: `name`, `kind` (`sensor` | `input`), `type`, and `scope`
+(the enclosing workflow's name). It supports `insert`, `lookup`, and
+`has`, and one table instance is created per workflow by the semantic
+analyzer (`src/semantic/analyzer.ts`).
+
+## 13. Phase Scope
+
+This specification covers the full CodeFlow grammar. Phase 1 implements
+lexical analysis and recursive-descent parsing, producing a preliminary
+AST with basic syntax-error reporting. Phase 2 adds the semantic rules
+in Section 12 above. TAC generation, optimization, and execution are
+scoped for Phase 3, per `CLAUDE.md` and the Phase 1 proposal.
