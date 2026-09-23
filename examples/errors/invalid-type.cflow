@@ -1,5 +1,5 @@
-// Expected diagnostic (Phase 2 semantic analysis): 'boolean + number' is not a valid operation.
-// Syntactically valid in Phase 1, since type checking is not yet implemented.
+// Expected diagnostic (semantic analysis): 'boolean + number' is not a valid operation.
+// Syntactically valid; the semantic analyzer's type checking reports this.
 workflow "Test" {
     input active : boolean
 
