@@ -8,6 +8,8 @@ import type { SymbolTable } from "../symbols/symbolTable.js";
 import { generateIR } from "../ir/generator.js";
 import type { WorkflowIR } from "../ir/instructions.js";
 import { optimize } from "../optimizer/optimizer.js";
+import { execute } from "../runtime/interpreter.js";
+import type { RuntimeInputs, WorkflowExecutionResult } from "../runtime/interpreter.js";
 
 export interface CompileResult {
   tokens: Token[];
@@ -18,15 +20,21 @@ export interface CompileResult {
   errors: CompilerError[];
 }
 
+export interface RunResult extends CompileResult {
+  execution: WorkflowExecutionResult[];
+}
+
 /**
- * Runs the CodeFlow pipeline: lexical analysis, recursive-descent parsing,
- * semantic analysis (declaration/scope/type checking over a symbol
- * table), Three-Address Code generation, and optimization (constant
- * folding, unreachable- and dead-code elimination). Execution is not yet
- * implemented (Phase 3). Every stage always runs over whatever artifact
- * the previous stage produced, even if earlier stages reported errors,
- * so that as many diagnostics as possible surface in a single pass and
- * every intermediate artifact stays inspectable.
+ * Runs the CodeFlow compiler pipeline: lexical analysis, recursive-descent
+ * parsing, semantic analysis (declaration/scope/type checking over a
+ * symbol table), Three-Address Code generation, and optimization
+ * (constant folding, unreachable- and dead-code elimination). Every stage
+ * always runs over whatever artifact the previous stage produced, even if
+ * earlier stages reported errors, so that as many diagnostics as possible
+ * surface in a single pass and every intermediate artifact stays
+ * inspectable. Execution is deliberately a separate step (see `run`
+ * below): compiling never requires runtime sensor/input values, only
+ * running does.
  */
 export function compile(source: string): CompileResult {
   const { tokens, errors: lexErrors } = new Lexer(source).tokenize();
@@ -42,4 +50,16 @@ export function compile(source: string): CompileResult {
     optimizedIR,
     errors: [...lexErrors, ...parseErrors, ...semanticErrors],
   };
+}
+
+/**
+ * Compiles `source` and then executes the optimized TAC against
+ * `runtimeInputs`, completing the full pipeline described in CLAUDE.md
+ * §24: string → tokens → AST → semantically-validated AST → IR →
+ * optimized IR → ExecutionResult.
+ */
+export function run(source: string, runtimeInputs: RuntimeInputs = {}): RunResult {
+  const compiled = compile(source);
+  const execution = execute(compiled.optimizedIR, runtimeInputs, compiled.symbolTables);
+  return { ...compiled, execution };
 }
