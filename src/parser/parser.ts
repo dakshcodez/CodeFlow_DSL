@@ -344,9 +344,19 @@ export class Parser {
 
   // ---- error recovery -----------------------------------------------------
 
+  /**
+   * Skips tokens until the next statement-start keyword or the closing
+   * brace of the current block, tracking brace depth so that braces
+   * belonging to a discarded nested block (e.g. an unparsable `when`
+   * condition) are not mistaken for the enclosing block's own braces.
+   */
   private synchronizeToStatement(): void {
-    while (!this.isAtEnd() && !this.check("RBrace")) {
-      if (STATEMENT_START_KINDS.includes(this.peek().kind)) return;
+    let depth = 0;
+    while (!this.isAtEnd()) {
+      const kind = this.peek().kind;
+      if (depth === 0 && (kind === "RBrace" || STATEMENT_START_KINDS.includes(kind))) return;
+      if (kind === "LBrace") depth++;
+      else if (kind === "RBrace") depth--;
       this.advance();
     }
   }
