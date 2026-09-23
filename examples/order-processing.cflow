@@ -1,0 +1,13 @@
+workflow "OrderProcessing" {
+    input orderAmount : number
+
+    when orderAmount > 5000 {
+        action fraud_check()
+    }
+
+    when orderAmount > 10000 {
+        action manager_approval()
+    }
+
+    action process_payment()
+}

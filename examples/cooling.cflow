@@ -1,0 +1,12 @@
+workflow "CoolingSystem" {
+    sensor temperature : number
+
+    when temperature > 35 {
+        alert "High temperature"
+        action start_fan()
+    }
+
+    otherwise {
+        log "Temperature normal"
+    }
+}
