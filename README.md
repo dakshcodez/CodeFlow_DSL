@@ -20,36 +20,40 @@ for the original Phase 1 proposal and design document.
 Phase 1 (Problem Definition & System Design) and Phase 2 (Core Compiler
 Construction — semantic analysis, symbol table, TAC generation) are
 complete. Phase 3 (Optimization, Execution & Integration) has added the
-optimizer. The compiler currently performs:
+optimizer and the execution engine, completing the full pipeline:
 
 ```
 Source (.cflow) → Lexer → Token List → Recursive-Descent Parser → AST
                 → Semantic Analyzer (scope + type checking, symbol table)
                 → Three-Address Code Generator
                 → Optimizer (constant folding, unreachable/dead-code elimination)
+                → Execution Engine (runs against user-supplied sensor/input values)
 ```
 
-The execution engine is **not yet implemented** — it is the remaining
-Phase 3 deliverable (see `CLAUDE.md` §20).
+Remaining Phase 3 work per `CLAUDE.md` §20: comprehensive end-to-end
+regression testing and final documentation polish.
 
 ## Getting Started
 
 ```bash
 npm install
-npm test           # run the test suite (lexer, parser, symbols, semantic, ir, optimizer, pipeline, web UI)
+npm test           # run the test suite (lexer, parser, symbols, semantic, ir, optimizer, runtime, pipeline, web UI)
 npm run typecheck   # type-check src/, web/, and tests/ with no emit
 npm run build       # compile src/ to dist/
 ```
 
-### Compile a CodeFlow program from the console
+### Compile (and optionally run) a CodeFlow program from the console
 
 ```bash
 npm run compile -- examples/cooling.cflow
+npm run compile -- examples/cooling.cflow '{"temperature": 38}'
 ```
 
 Prints the token stream, the resulting AST as JSON, the per-workflow
 symbol tables, the generated and optimized Three-Address Code, and any
-lexical, syntax, or semantic errors.
+lexical, syntax, or semantic errors. Passing a JSON object of runtime
+sensor/input values as a third argument also executes the program and
+prints its trace (alerts, logs, action calls) or any runtime error.
 
 ### Browser visualization
 
@@ -58,9 +62,9 @@ npm run build:web
 python3 -m http.server 8000 --directory web   # or any static file server
 ```
 
-Open `web/index.html` to edit CodeFlow source and inspect the generated
-tokens, AST, symbol table, and before/after Three-Address Code
-interactively.
+Open `web/index.html` to edit CodeFlow source, edit JSON runtime inputs,
+and inspect the generated tokens, AST, symbol table, before/after
+Three-Address Code, and execution trace interactively.
 
 ## Repository Layout
 
@@ -74,9 +78,10 @@ src/
   semantic/      Semantic analyzer (scope + type checking)
   ir/            TAC instruction types, generator, and printer
   optimizer/     Constant folding, unreachable/dead-code elimination
+  runtime/       TAC interpreter (execution engine)
   compiler/      Pipeline wiring (lexer + parser + semantic + IR + optimizer)
   cli.ts         Console entry point
-web/             Lightweight browser visualization (tokens/AST/symbols/IR)
+web/             Lightweight browser visualization (tokens/AST/symbols/IR/trace)
 tests/           Unit and regression tests, mirroring src/ structure
 examples/        Canonical and intentionally malformed .cflow programs
 docs/            Language specification and the Phase 1 proposal PDF
