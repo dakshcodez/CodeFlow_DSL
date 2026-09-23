@@ -15,26 +15,27 @@ formal language specification, and
 [`docs/CodeFlow_Phase1_Proposal.pdf`](./docs/CodeFlow_Phase1_Proposal.pdf)
 for the original Phase 1 proposal and design document.
 
-## Project Status: Phase 1
+## Project Status: Phase 2 (in progress, branch `phase2`)
 
-Phase 1 (Problem Definition & System Design) is implemented. The
-compiler currently performs:
+Phase 1 (Problem Definition & System Design) is complete. Phase 2 (Core
+Compiler Construction) adds semantic analysis and the symbol table on
+top of it. The compiler currently performs:
 
 ```
 Source (.cflow) → Lexer → Token List → Recursive-Descent Parser → AST
-                                                → Basic Syntax Validation
+                → Semantic Analyzer (scope + type checking, symbol table)
 ```
 
-Semantic analysis, symbol-table type checking, TAC generation,
-optimization, and execution are **not yet implemented** — they are
-planned for Phases 2 and 3 (see `CLAUDE.md` §20).
+TAC generation, optimization, and execution are **not yet implemented**
+— they are planned for Phase 3 (see `CLAUDE.md` §20).
 
 ## Getting Started
 
 ```bash
 npm install
-npm test          # run the test suite (lexer, parser, pipeline, web UI)
-npm run build      # type-check and compile src/ to dist/
+npm test           # run the test suite (lexer, parser, symbols, semantic, pipeline, web UI)
+npm run typecheck   # type-check src/, web/, and tests/ with no emit
+npm run build       # compile src/ to dist/
 ```
 
 ### Compile a CodeFlow program from the console
@@ -43,8 +44,8 @@ npm run build      # type-check and compile src/ to dist/
 npm run compile -- examples/cooling.cflow
 ```
 
-Prints the token stream, the resulting AST as JSON, and any lexical or
-syntax errors.
+Prints the token stream, the resulting AST as JSON, the per-workflow
+symbol tables, and any lexical, syntax, or semantic errors.
 
 ### Browser visualization
 
@@ -54,7 +55,7 @@ python3 -m http.server 8000 --directory web   # or any static file server
 ```
 
 Open `web/index.html` to edit CodeFlow source and inspect the generated
-tokens and AST interactively.
+tokens, AST, and symbol table interactively.
 
 ## Repository Layout
 
@@ -64,9 +65,11 @@ src/
   lexer/         Token kinds, Token type, lexical analyzer
   ast/           AST node type definitions
   parser/        Recursive-descent parser
-  compiler/      Pipeline wiring (lexer + parser)
+  symbols/       Per-workflow symbol table
+  semantic/      Semantic analyzer (scope + type checking)
+  compiler/      Pipeline wiring (lexer + parser + semantic analyzer)
   cli.ts         Console entry point
-web/             Lightweight browser visualization (tokens + AST)
+web/             Lightweight browser visualization (tokens + AST + symbols)
 tests/           Unit and regression tests, mirroring src/ structure
 examples/        Canonical and intentionally malformed .cflow programs
 docs/            Language specification and the Phase 1 proposal PDF
