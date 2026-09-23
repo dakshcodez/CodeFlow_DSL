@@ -15,26 +15,28 @@ formal language specification, and
 [`docs/CodeFlow_Phase1_Proposal.pdf`](./docs/CodeFlow_Phase1_Proposal.pdf)
 for the original Phase 1 proposal and design document.
 
-## Project Status: Phase 2 (in progress, branch `phase2`)
+## Project Status: Phase 3 (in progress, branch `phase3`)
 
-Phase 1 (Problem Definition & System Design) is complete. Phase 2 (Core
-Compiler Construction) adds semantic analysis, the symbol table, and TAC
-generation on top of it. The compiler currently performs:
+Phase 1 (Problem Definition & System Design) and Phase 2 (Core Compiler
+Construction — semantic analysis, symbol table, TAC generation) are
+complete. Phase 3 (Optimization, Execution & Integration) has added the
+optimizer. The compiler currently performs:
 
 ```
 Source (.cflow) → Lexer → Token List → Recursive-Descent Parser → AST
                 → Semantic Analyzer (scope + type checking, symbol table)
                 → Three-Address Code Generator
+                → Optimizer (constant folding, unreachable/dead-code elimination)
 ```
 
-Optimization and execution are **not yet implemented** — they are
-planned for Phase 3 (see `CLAUDE.md` §20).
+The execution engine is **not yet implemented** — it is the remaining
+Phase 3 deliverable (see `CLAUDE.md` §20).
 
 ## Getting Started
 
 ```bash
 npm install
-npm test           # run the test suite (lexer, parser, symbols, semantic, ir, pipeline, web UI)
+npm test           # run the test suite (lexer, parser, symbols, semantic, ir, optimizer, pipeline, web UI)
 npm run typecheck   # type-check src/, web/, and tests/ with no emit
 npm run build       # compile src/ to dist/
 ```
@@ -46,8 +48,8 @@ npm run compile -- examples/cooling.cflow
 ```
 
 Prints the token stream, the resulting AST as JSON, the per-workflow
-symbol tables, the generated Three-Address Code, and any lexical,
-syntax, or semantic errors.
+symbol tables, the generated and optimized Three-Address Code, and any
+lexical, syntax, or semantic errors.
 
 ### Browser visualization
 
@@ -57,7 +59,8 @@ python3 -m http.server 8000 --directory web   # or any static file server
 ```
 
 Open `web/index.html` to edit CodeFlow source and inspect the generated
-tokens, AST, symbol table, and Three-Address Code interactively.
+tokens, AST, symbol table, and before/after Three-Address Code
+interactively.
 
 ## Repository Layout
 
@@ -70,7 +73,8 @@ src/
   symbols/       Per-workflow symbol table
   semantic/      Semantic analyzer (scope + type checking)
   ir/            TAC instruction types, generator, and printer
-  compiler/      Pipeline wiring (lexer + parser + semantic analyzer + IR)
+  optimizer/     Constant folding, unreachable/dead-code elimination
+  compiler/      Pipeline wiring (lexer + parser + semantic + IR + optimizer)
   cli.ts         Console entry point
 web/             Lightweight browser visualization (tokens/AST/symbols/IR)
 tests/           Unit and regression tests, mirroring src/ structure
