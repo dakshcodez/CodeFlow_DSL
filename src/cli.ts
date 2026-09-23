@@ -3,6 +3,8 @@ import { formatCompilerError } from "./diagnostics/diagnostics.js";
 import { compile } from "./compiler/pipeline.js";
 import type { Token } from "./lexer/token.js";
 import type { SymbolTable } from "./symbols/symbolTable.js";
+import type { WorkflowIR } from "./ir/instructions.js";
+import { formatWorkflowIR } from "./ir/print.js";
 
 function printTokens(tokens: Token[]): void {
   console.log(`\n-- Tokens (${tokens.length}) --`);
@@ -27,6 +29,13 @@ function printSymbolTables(symbolTables: SymbolTable[]): void {
   }
 }
 
+function printIR(ir: WorkflowIR[]): void {
+  console.log(`\n-- Three-Address Code (${ir.length} workflow(s)) --`);
+  for (const workflowIR of ir) {
+    console.log(formatWorkflowIR(workflowIR));
+  }
+}
+
 function main(): void {
   const filePath = process.argv[2];
   if (!filePath) {
@@ -36,7 +45,7 @@ function main(): void {
   }
 
   const source = readFileSync(filePath, "utf-8");
-  const { tokens, program, symbolTables, errors } = compile(source);
+  const { tokens, program, symbolTables, ir, errors } = compile(source);
 
   printTokens(tokens);
 
@@ -44,6 +53,7 @@ function main(): void {
   console.log(JSON.stringify(program, null, 2));
 
   printSymbolTables(symbolTables);
+  printIR(ir);
 
   if (errors.length > 0) {
     console.log(`\n-- Errors (${errors.length}) --`);
