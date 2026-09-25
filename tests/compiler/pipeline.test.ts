@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { compile } from "../../src/compiler/pipeline.js";
+import { formatInstruction } from "../../src/ir/print.js";
 
 function loadExample(relativePath: string): string {
   return readFileSync(new URL(`../../examples/${relativePath}`, import.meta.url), "utf-8");
@@ -31,13 +32,41 @@ describe("compile pipeline", () => {
     expect(errors.some((e) => e.stage === "lexical")).toBe(true);
   });
 
-  it("parses the undefined-identifier example without error at Phase 1 (no semantic analysis yet)", () => {
+  it("reports a semantic error for the undefined-identifier example", () => {
     const { errors } = compile(loadExample("errors/undefined-identifier.cflow"));
-    expect(errors).toEqual([]);
+    expect(errors.some((e) => e.stage === "semantic" && e.message.includes("Undefined identifier"))).toBe(
+      true
+    );
   });
 
-  it("parses the invalid-type example without error at Phase 1 (no semantic analysis yet)", () => {
+  it("reports a semantic error for the invalid-type example", () => {
     const { errors } = compile(loadExample("errors/invalid-type.cflow"));
-    expect(errors).toEqual([]);
+    expect(errors.some((e) => e.stage === "semantic")).toBe(true);
+  });
+
+  it("populates a symbol table per workflow", () => {
+    const { symbolTables } = compile(loadExample("cooling.cflow"));
+    expect(symbolTables).toHaveLength(1);
+    expect(symbolTables[0]!.symbols).toEqual([
+      expect.objectContaining({ name: "temperature", kind: "sensor", type: "number" }),
+    ]);
+  });
+
+  it("generates TAC for the canonical cooling-system example", () => {
+    const { ir } = compile(loadExample("cooling.cflow"));
+    expect(ir).toHaveLength(1);
+    expect(ir[0]!.workflowName).toBe("CoolingSystem");
+    expect(ir[0]!.instructions.map(formatInstruction)).toEqual([
+      "t1 = temperature",
+      "t2 = 35",
+      "t3 = t1 > t2",
+      "IF_FALSE t3 GOTO L1",
+      'ALERT "High temperature"',
+      "CALL start_fan()",
+      "GOTO L2",
+      "LABEL L1",
+      'LOG "Temperature normal"',
+      "LABEL L2",
+    ]);
   });
 });

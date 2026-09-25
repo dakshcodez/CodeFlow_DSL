@@ -3,20 +3,38 @@ import { Lexer } from "../lexer/lexer.js";
 import type { Token } from "../lexer/token.js";
 import { Parser } from "../parser/parser.js";
 import type { Program } from "../ast/nodes.js";
+import { analyze } from "../semantic/analyzer.js";
+import type { SymbolTable } from "../symbols/symbolTable.js";
+import { generateIR } from "../ir/generator.js";
+import type { WorkflowIR } from "../ir/instructions.js";
 
 export interface CompileResult {
   tokens: Token[];
   program: Program;
+  symbolTables: SymbolTable[];
+  ir: WorkflowIR[];
   errors: CompilerError[];
 }
 
 /**
- * Runs the Phase 1 CodeFlow pipeline: lexical analysis followed by
- * recursive-descent parsing. Semantic analysis, IR generation,
- * optimization, and execution are not yet implemented (Phases 2 and 3).
+ * Runs the CodeFlow pipeline: lexical analysis, recursive-descent parsing,
+ * semantic analysis (declaration/scope/type checking over a symbol
+ * table), and Three-Address Code generation. Optimization and execution
+ * are not yet implemented (Phase 3). Every stage always runs over
+ * whatever artifact the previous stage produced, even if earlier stages
+ * reported errors, so that as many diagnostics as possible surface in a
+ * single pass and every intermediate artifact stays inspectable.
  */
 export function compile(source: string): CompileResult {
   const { tokens, errors: lexErrors } = new Lexer(source).tokenize();
   const { program, errors: parseErrors } = new Parser(tokens).parse();
-  return { tokens, program, errors: [...lexErrors, ...parseErrors] };
+  const { symbolTables, errors: semanticErrors } = analyze(program);
+  const ir = generateIR(program);
+  return {
+    tokens,
+    program,
+    symbolTables,
+    ir,
+    errors: [...lexErrors, ...parseErrors, ...semanticErrors],
+  };
 }
