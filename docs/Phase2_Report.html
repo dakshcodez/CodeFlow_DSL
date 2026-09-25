@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CodeFlow Phase 2 Report</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm 22mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Georgia", "Times New Roman", serif;
+    color: #1a1a1a;
+    font-size: 11pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .titlepage {
+    height: 250mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .titlepage .kicker {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 11pt;
+    color: #555;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    margin-bottom: 18px;
+  }
+  .titlepage h1 {
+    font-size: 34pt;
+    margin: 0 0 6px 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+  }
+  .titlepage h2 {
+    font-size: 16pt;
+    font-weight: 400;
+    color: #333;
+    margin: 0 0 40px 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    max-width: 480px;
+  }
+  .titlepage .divider {
+    width: 70px;
+    height: 3px;
+    background: #b8321f;
+    margin: 24px 0 30px 0;
+  }
+  .titlepage .meta {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    color: #222;
+    line-height: 2;
+  }
+  .titlepage .meta strong { font-weight: 600; }
+  .titlepage .footer {
+    position: absolute;
+    bottom: 26mm;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 9pt;
+    color: #888;
+  }
+  h1.section {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 18pt;
+    border-bottom: 2px solid #b8321f;
+    padding-bottom: 6px;
+    margin-top: 30px;
+    margin-bottom: 14px;
+    page-break-after: avoid;
+  }
+  h2 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 13pt;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    color: #b8321f;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 11.5pt;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  p { margin: 6px 0 10px 0; text-align: justify; }
+  code {
+    font-family: "SF Mono", "Consolas", monospace;
+    background: #f1efe9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 9.5pt;
+  }
+  pre {
+    font-family: "SF Mono", "Consolas", monospace;
+    background: #f6f5f0;
+    border: 1px solid #ddd8c8;
+    border-left: 3px solid #b8321f;
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 9pt;
+    line-height: 1.45;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    page-break-inside: avoid;
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0 16px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #2b2b2b;
+    color: #fff;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    font-size: 9pt;
+  }
+  tr:nth-child(even) td { background: #f8f7f3; }
+  ul, ol { margin: 6px 0 12px 0; padding-left: 22px; }
+  li { margin-bottom: 3px; }
+  .badge {
+    display: inline-block;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+  .badge-new { background: #dff0d8; color: #2e6b1f; }
+  .badge-carried { background: #e2e2e2; color: #444; }
+  .badge-future { background: #f5e2c8; color: #8a5a00; }
+  .test-list { columns: 1; font-size: 9.5pt; }
+  .callout {
+    background: #fdf3e3;
+    border: 1px solid #ecd9a8;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 9.5pt;
+    margin: 10px 0;
+  }
+  .pipeline {
+    font-family: "SF Mono", Consolas, monospace;
+    background: #232323;
+    color: #eee;
+    padding: 14px 16px;
+    border-radius: 5px;
+    font-size: 9.5pt;
+    text-align: center;
+    line-height: 2;
+    margin: 12px 0 18px 0;
+  }
+  .pipeline .arrow { color: #b8321f; margin: 0 6px; }
+  .pipeline .done { color: #8fd67a; }
+  .pipeline .future { color: #888; }
+  .toc { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .page-break { page-break-before: always; }
+  .small { font-size: 9pt; color: #555; }
+  footer.pagefoot {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 8pt;
+    color: #999;
+    text-align: center;
+    margin-top: 26px;
+    border-top: 1px solid #ddd;
+    padding-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="titlepage">
+  <div class="kicker">Compiler Design Laboratory &middot; BCSE307P</div>
+  <h1>CodeFlow</h1>
+  <h2>A Domain-Specific Language and Compiler for Workflow Automation</h2>
+  <div class="divider"></div>
+  <h2 style="font-size:20pt; font-weight:600; color:#1a1a1a; margin-bottom:6px;">Phase 2 Report</h2>
+  <h2 style="margin-top:0;">Core Compiler Construction — Semantic Analysis, Symbol Table &amp; Three-Address Code Generation</h2>
+  <div class="meta">
+    <div><strong>Author:</strong> Daksh Arora</div>
+    <div><strong>Project type:</strong> Individual Project</div>
+    <div><strong>Implementation language:</strong> TypeScript / Node.js</div>
+    <div><strong>Date:</strong> September 25, 2026</div>
+  </div>
+  <div class="footer">CodeFlow DSL &amp; Compiler &mdash; Phase 2 of 3</div>
+</div>
+
+<h1 class="section">1. Introduction &amp; Scope</h1>
+
+<p>
+CodeFlow is a small, statically-typed, textual Domain-Specific Language (DSL)
+for expressing conditional workflow automation: declaring named
+<code>sensor</code>/<code>input</code> values, testing conditions over them,
+and triggering <code>action</code>, <code>alert</code>, or <code>log</code>
+effects in response. Phase 1 defined the language specification, grammar, and
+overall compiler architecture, and delivered an initial lexer/parser/AST
+prototype. This report covers <strong>Phase 2 &mdash; Core Compiler
+Construction</strong>, which extends that prototype into a semantically
+validated compiler front end that emits an intermediate representation.
+</p>
+
+<p>Per the project roadmap, Phase 2 targets the pipeline segment:</p>
+
+<div class="pipeline">
+  Source (.cflow) <span class="arrow">&rarr;</span>
+  Lexer <span class="arrow">&rarr;</span>
+  Tokens <span class="arrow">&rarr;</span>
+  Recursive-Descent Parser <span class="arrow">&rarr;</span>
+  AST <span class="arrow">&rarr;</span>
+  Semantic Analyzer <span class="arrow">&rarr;</span>
+  Symbol Table <span class="arrow">&rarr;</span>
+  Three-Address Code
+</div>
+
+<p>
+Optimization and the execution engine remain out of scope for Phase 2 and are
+deferred to Phase 3. The compiler pipeline runs every implemented stage
+unconditionally &mdash; even when an earlier stage reports diagnostics &mdash;
+so that all intermediate artifacts (tokens, AST, symbol table, TAC) stay
+available for inspection in a single compilation pass, supporting the
+project's goal of making the source-to-execution transformation observable.
+</p>
+
+<h2>1.1 Summary of Phase 2 Deliverables</h2>
+
+<table>
+  <thead><tr><th>Module</th><th>Location</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Lexer</td><td><code>src/lexer/</code></td><td>Carried from Phase 1 <span class="badge badge-carried">unchanged</span></td></tr>
+    <tr><td>Parser</td><td><code>src/parser/parser.ts</code></td><td>Carried from Phase 1 <span class="badge badge-carried">unchanged</span></td></tr>
+    <tr><td>AST node types</td><td><code>src/ast/nodes.ts</code></td><td>Carried from Phase 1 <span class="badge badge-carried">unchanged</span></td></tr>
+    <tr><td>Symbol table</td><td><code>src/symbols/symbolTable.ts</code></td><td><span class="badge badge-new">new in Phase 2</span></td></tr>
+    <tr><td>Semantic analyzer</td><td><code>src/semantic/analyzer.ts</code></td><td><span class="badge badge-new">new in Phase 2</span></td></tr>
+    <tr><td>TAC instruction model</td><td><code>src/ir/instructions.ts</code></td><td><span class="badge badge-new">new in Phase 2</span></td></tr>
+    <tr><td>TAC generator</td><td><code>src/ir/generator.ts</code></td><td><span class="badge badge-new">new in Phase 2</span></td></tr>
+    <tr><td>TAC pretty-printer</td><td><code>src/ir/print.ts</code></td><td><span class="badge badge-new">new in Phase 2</span></td></tr>
+    <tr><td>Diagnostics model</td><td><code>src/diagnostics/diagnostics.ts</code></td><td>Extended with <code>"semantic"</code> stage</td></tr>
+    <tr><td>Pipeline wiring</td><td><code>src/compiler/pipeline.ts</code></td><td>Extended: analyzer + IR generator wired in</td></tr>
+    <tr><td>CLI</td><td><code>src/cli.ts</code></td><td>Extended: prints symbol tables + TAC</td></tr>
+    <tr><td>Web visualization</td><td><code>web/app.ts</code></td><td>Extended: symbol table + TAC panels</td></tr>
+    <tr><td>Optimizer</td><td><code>src/optimizer/</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+    <tr><td>Execution engine</td><td><code>src/runtime/</code></td><td><span class="badge badge-future">Phase 3</span></td></tr>
+  </tbody>
+</table>
+
+<h1 class="section">2. Front End Recap: Lexer, Parser, AST</h1>
+
+<p>
+The lexer (<code>src/lexer/lexer.ts</code>, 245 lines) and recursive-descent
+parser (<code>src/parser/parser.ts</code>, 436 lines) were built in Phase 1
+and are unchanged in Phase 2; they are included here because every later
+stage of Phase 2 operates directly on their output. The lexer converts raw
+source text into a <code>Token[]</code>, tracking line/column/offset for every
+token and reporting illegal characters, malformed numeric literals, and
+unterminated strings as lexical <code>CompilerError</code>s. The parser is a
+hand-written recursive-descent implementation matching the operator
+precedence table from the Phase 1 grammar
+(<code>parseExpression &rarr; parseOr &rarr; parseAnd &rarr; parseNot &rarr;
+parseRelational &rarr; parseAdditive &rarr; parseMultiplicative &rarr;
+parseUnary &rarr; parsePrimary</code>), constructing the AST described below
+without performing any symbol resolution or type checking &mdash; that
+responsibility belongs entirely to the Phase 2 semantic analyzer, keeping
+syntax and semantic analysis cleanly separated as required by the project's
+architectural rules.
+</p>
+
+<h2>2.1 AST Node Model</h2>
+
+<p>
+The AST (<code>src/ast/nodes.ts</code>) is a discriminated union of plain
+TypeScript interfaces, each tagged by a <code>kind</code> field and carrying a
+<code>SourceLocation</code> ({ <code>line</code>, <code>column</code> }) so
+that every downstream diagnostic can point back to source text.
+</p>
+
+<table>
+  <thead><tr><th>Node</th><th>Fields</th><th>Represents</th></tr></thead>
+  <tbody>
+    <tr><td><code>Program</code></td><td><code>workflows: WorkflowDecl[]</code></td><td>The whole compilation unit</td></tr>
+    <tr><td><code>WorkflowDecl</code></td><td><code>name, declarations, statements</code></td><td>One <code>workflow "..." { ... }</code> block</td></tr>
+    <tr><td><code>Declaration</code></td><td><code>declKind (sensor|input), name, type</code></td><td>A <code>sensor</code>/<code>input</code> declaration</td></tr>
+    <tr><td><code>WhenStatement</code></td><td><code>condition: Expr, body: Statement[]</code></td><td><code>when &lt;expr&gt; { ... }</code></td></tr>
+    <tr><td><code>OtherwiseStatement</code></td><td><code>body: Statement[]</code></td><td><code>otherwise { ... }</code></td></tr>
+    <tr><td><code>ActionStatement</code></td><td><code>name, args: Expr[]</code></td><td><code>action name(args)</code></td></tr>
+    <tr><td><code>AlertStatement</code></td><td><code>message: string</code></td><td><code>alert "..."</code></td></tr>
+    <tr><td><code>LogStatement</code></td><td><code>message: string</code></td><td><code>log "..."</code></td></tr>
+    <tr><td><code>LiteralExpr</code></td><td><code>literalType, value</code></td><td>Number / string / boolean literal</td></tr>
+    <tr><td><code>IdentifierExpr</code></td><td><code>name</code></td><td>A reference to a declared sensor/input</td></tr>
+    <tr><td><code>UnaryExpr</code></td><td><code>operator (- | NOT), operand</code></td><td>Unary minus / logical NOT</td></tr>
+    <tr><td><code>BinaryExpr</code></td><td><code>operator, left, right</code></td><td>Arithmetic / relational / logical binary op</td></tr>
+  </tbody>
+</table>
+
+<p class="small">
+<code>PrimitiveType</code> = <code>"number" | "string" | "boolean"</code>;
+<code>BinaryOperator</code> = <code>+ - * / &gt; &lt; &gt;= &lt;= == != AND OR</code>;
+<code>UnaryOperator</code> = <code>- | NOT</code>.
+</p>
+
+<h1 class="section page-break">3. Symbol Table</h1>
+
+<p>
+<code>SymbolTable</code> (<code>src/symbols/symbolTable.ts</code>, 55 lines)
+is new in Phase 2. It implements the symbol-table contract from the project
+specification &mdash; recording <code>name</code>, <code>kind</code>,
+<code>type</code>, and <code>scope</code> per declared symbol &mdash; with
+<strong>one flat table per workflow</strong>. This design follows directly
+from the language rule that a workflow is the only scope boundary in
+CodeFlow: declarations appear once, at the top of a workflow, and are never
+nested inside <code>when</code>/<code>otherwise</code> blocks, so a single
+<code>Map&lt;string, SymbolEntry&gt;</code> per workflow is sufficient to
+model scope resolution correctly without a scope-chain/stack structure.
+</p>
+
+<h2>3.1 Interface</h2>
+<pre><code>class SymbolTable {
+  readonly scope: string;                         // the workflow name
+  insert(declaration: SymbolDeclaration): boolean; // false if name already exists in this scope
+  lookup(name: string): SymbolEntry | undefined;   // scope-qualified resolution
+  has(name: string): boolean;
+  get symbols(): readonly SymbolEntry[];           // enumeration, for the symbol-table view
+}</code></pre>
+
+<p>
+<code>insert</code> is the mechanism used to detect duplicate declarations:
+it refuses to overwrite an existing entry and returns <code>false</code>,
+which the semantic analyzer turns into a diagnostic rather than silently
+shadowing the first declaration. <code>sensor</code> and <code>input</code>
+declarations share one namespace per workflow (a workflow cannot declare a
+<code>sensor temperature</code> and an <code>input temperature</code> at the
+same time), matching real-world workflow-automation semantics where both are
+just named inputs to the condition logic.
+</p>
+
+<h2>3.2 Construction</h2>
+<p>
+The semantic analyzer constructs exactly one <code>SymbolTable</code> per
+<code>WorkflowDecl</code> while walking the program, inserting every
+declaration in that workflow's <code>declarations</code> list before
+analyzing its statements. All constructed tables are returned from
+<code>analyze()</code> as <code>SemanticResult.symbolTables</code>, giving the
+CLI and web visualization a per-workflow view (Symbol Table panel) with no
+extra bookkeeping.
+</p>
+
+<h1 class="section">4. Semantic Analyzer</h1>
+
+<p>
+<code>analyze(program)</code> (<code>src/semantic/analyzer.ts</code>,
+217 lines) is the core new component of Phase 2. It performs a single
+recursive walk over the AST, enforcing every property the context-free
+grammar cannot express on its own: declaration checking, duplicate detection,
+scope checking, and a full static type-checking pass that assigns a
+<code>PrimitiveType</code> to every expression node.
+</p>
+
+<h2>4.1 Declaration &amp; Scope Checking</h2>
+<p>
+Every <code>IdentifierExpr</code> is resolved against the enclosing
+workflow's <code>SymbolTable</code>. An identifier with no matching
+declaration is reported as <code>Undefined identifier '&lt;name&gt;'</code>
+at its source location. Because CodeFlow has exactly one scope level
+(the workflow), there is no scope-chain walk &mdash; resolution is a single
+<code>lookup()</code> call against the current workflow's table, and a
+declaration made in one workflow is never visible from another (verified by
+the <em>"does not leak a declaration from one workflow into another"</em>
+test).
+</p>
+
+<h2>4.2 Duplicate Declaration Checking</h2>
+<p>
+While populating each workflow's symbol table, a second declaration reusing
+an already-declared name is reported as
+<code>Duplicate declaration of '&lt;name&gt;' in workflow "&lt;workflow&gt;"</code>,
+and the original entry is left untouched in the table (so subsequent lookups
+still resolve against the first, valid declaration).
+</p>
+
+<h2>4.3 Type Checking</h2>
+<p>
+The analyzer performs bottom-up type inference over every <code>Expr</code>,
+returning a <code>PrimitiveType | undefined</code> (<code>undefined</code>
+marks an expression that already failed to type-check, which stops errors
+from cascading further up the same expression tree). Successfully typed
+expressions are recorded in <code>SemanticResult.types: Map&lt;Expr,
+PrimitiveType&gt;</code> for potential reuse by later stages.
+</p>
+
+<table>
+  <thead><tr><th>Operator class</th><th>Operators</th><th>Required operand type(s)</th><th>Result type</th></tr></thead>
+  <tbody>
+    <tr><td>Arithmetic</td><td><code>+ - * /</code></td><td><code>number, number</code></td><td><code>number</code></td></tr>
+    <tr><td>Relational</td><td><code>&gt; &lt; &gt;= &lt;=</code></td><td><code>number, number</code></td><td><code>boolean</code></td></tr>
+    <tr><td>Equality</td><td><code>== !=</code></td><td>both operands the <em>same</em> primitive type</td><td><code>boolean</code></td></tr>
+    <tr><td>Logical (binary)</td><td><code>AND OR</code></td><td><code>boolean, boolean</code></td><td><code>boolean</code></td></tr>
+    <tr><td>Logical (unary)</td><td><code>NOT</code></td><td><code>boolean</code></td><td><code>boolean</code></td></tr>
+    <tr><td>Arithmetic (unary)</td><td><code>-</code></td><td><code>number</code></td><td><code>number</code></td></tr>
+  </tbody>
+</table>
+
+<p>
+Additionally, the condition expression of every <code>when</code> statement
+is required to type as <code>boolean</code>
+(<code>The condition of a 'when' statement must be of type 'boolean', but
+found '&lt;type&gt;'</code>); a non-boolean condition such as
+<code>when temperature { ... }</code> is rejected even though
+<code>temperature</code> itself is a validly-declared identifier.
+</p>
+
+<h3>Accepted programs (excerpt from the test suite)</h3>
+<pre><code>number &gt; number        // relational, numeric operands
+number + number        // arithmetic
+boolean AND boolean    // logical
+string == string       // equality, matching types
+boolean == boolean     // equality, matching types</code></pre>
+
+<h3>Rejected programs (excerpt from the test suite)</h3>
+<pre><code>"hello" &gt; 10           // relational requires number, number
+true + 5               // arithmetic requires number, number
+10 AND 5               // logical requires boolean, boolean
+temperature AND 10     // temperature: number, AND requires boolean</code></pre>
+
+<h2>4.4 Error Recovery</h2>
+<p>
+Analysis does not stop at the first diagnostic. Mirroring the parser's own
+recovery strategy, the analyzer keeps walking the remaining declarations,
+statements, and workflows after reporting an error, so a single compilation
+pass can surface every semantic problem in a program rather than forcing the
+user to fix and recompile one error at a time. Errors are still prevented
+from <em>cascading</em> within one expression: once an operand fails to
+resolve or type-check, the enclosing expression returns <code>undefined</code>
+instead of guessing a type and reporting a second, spurious error on top of
+the first.
+</p>
+
+<h2>4.5 Diagnostic Output</h2>
+<p>
+Every semantic diagnostic is emitted as a <code>CompilerError</code> with
+<code>stage: "semantic"</code> and the offending node's <code>line</code>/
+<code>column</code>, consistent with the shared cross-cutting error model
+used by the lexer and parser:
+</p>
+<pre><code>type CompilerError = {
+  stage: "lexical" | "syntax" | "semantic" | "runtime";
+  message: string;
+  line?: number;
+  column?: number;
+  length?: number;
+};</code></pre>
+
+<h1 class="section page-break">5. Three-Address Code Generation</h1>
+
+<h2>5.1 Instruction Model</h2>
+<p>
+<code>src/ir/instructions.ts</code> defines TAC as a discriminated union
+(<code>IRInstruction</code>) of nine structured instruction shapes, rather
+than free-form strings, so the instruction stream stays type-safe and
+straightforward for the Phase 3 optimizer and execution engine to pattern
+match over:
+</p>
+<pre><code>type IRInstruction =
+  | AssignInstruction            // dest = value
+  | BinaryInstruction            // dest = left OP right
+  | UnaryInstruction             // dest = OP operand
+  | ConditionalJumpInstruction   // IF_FALSE cond GOTO label
+  | JumpInstruction              // GOTO label
+  | LabelInstruction             // LABEL label
+  | CallInstruction              // CALL name(args)
+  | AlertInstruction             // ALERT "message"
+  | LogInstruction;              // LOG "message"</code></pre>
+
+<p>
+Operands are likewise a closed union:
+</p>
+<pre><code>type Operand =
+  | { kind: "Temp";  id: number }               // compiler-generated temporary
+  | { kind: "Var";   name: string }              // a declared sensor/input
+  | { kind: "Const"; value: number | string | boolean }; // a literal value</code></pre>
+
+<p>
+The generator always materializes <code>Var</code> and <code>Const</code>
+operands into a <code>Temp</code> via an <code>Assign</code> instruction
+before they are used in any computation, so every instruction only ever
+references the result of at most one prior operation &mdash; true
+three-address discipline, with no instruction doing more than "one
+operator's worth" of work. Each workflow lowers to its own
+<code>WorkflowIR = { workflowName, instructions: IRInstruction[] }</code>.
+</p>
+
+<h2>5.2 Generation Algorithm</h2>
+<p>
+<code>generateIR(program)</code> (<code>src/ir/generator.ts</code>,
+152 lines) lowers each workflow's AST independently &mdash; workflows never
+call one another in CodeFlow, so per-workflow temporary (<code>t1, t2,
+...</code>) and label (<code>L1, L2, ...</code>) counters simply reset at the
+start of each workflow.
+</p>
+<ul>
+  <li><strong>Expressions</strong> always lower to a <code>Temp</code> operand: a <code>LiteralExpr</code> or <code>IdentifierExpr</code> is first assigned into a fresh temporary, then combined through <code>Binary</code>/<code>Unary</code> instructions whose operands are themselves temporaries.</li>
+  <li><strong><code>when</code> alone</strong> lowers to: evaluate the condition, <code>IfFalse cond GOTO endLabel</code>, the body, then <code>Label endLabel</code>.</li>
+  <li><strong><code>when</code> immediately followed by <code>otherwise</code></strong> in the same statement list lowers to a structured if/else: <code>IfFalse cond GOTO elseLabel</code>, the <code>when</code> body, <code>Goto endLabel</code>, <code>Label elseLabel</code>, the <code>otherwise</code> body, <code>Label endLabel</code>. This pairing is purely structural &mdash; adjacency of the two statements in the list &mdash; and introduces no new grammar rule, matching the language's definition of <code>otherwise</code> as a fallback executed only when the immediately preceding <code>when</code>'s condition is false.</li>
+  <li><strong>An orphaned <code>otherwise</code></strong> (no directly preceding <code>when</code>) has no condition to fall back on, so its body is lowered unconditionally.</li>
+  <li><strong><code>action</code>/<code>alert</code>/<code>log</code></strong> lower directly to <code>Call</code>/<code>Alert</code>/<code>Log</code> instructions; action arguments are lowered like any other expression and passed as a list of operands.</li>
+</ul>
+
+<h2>5.3 Worked Example</h2>
+<p>For the canonical example program <code>examples/cooling.cflow</code>:</p>
+<pre><code>workflow "CoolingSystem" {
+    sensor temperature : number
+
+    when temperature &gt; 35 {
+        alert "High temperature"
+        action start_fan()
+    }
+
+    otherwise {
+        log "Temperature normal"
+    }
+}</code></pre>
+
+<p>the generator emits (as rendered by the CLI / <code>formatWorkflowIR</code>):</p>
+
+<pre><code>workflow "CoolingSystem":
+    t1 = temperature
+    t2 = 35
+    t3 = t1 &gt; t2
+    IF_FALSE t3 GOTO L1
+    ALERT "High temperature"
+    CALL start_fan()
+    GOTO L2
+LABEL L1
+    LOG "Temperature normal"
+LABEL L2</code></pre>
+
+<p>
+<code>src/ir/print.ts</code> (43 lines) is a pure formatter that renders this
+human-readable text from a <code>WorkflowIR</code>; it is consulted only by
+the CLI and the web visualization and is never read back by any compiler
+stage, preserving the rule that IR consumers act on the structured
+<code>IRInstruction[]</code>, not on its printed form.
+</p>
+
+<h1 class="section">6. Pipeline, CLI &amp; Visualization Integration</h1>
+
+<h2>6.1 Compiler Pipeline</h2>
+<p>
+<code>compile(source: string): CompileResult</code>
+(<code>src/compiler/pipeline.ts</code>) wires the four implemented stages
+together:
+</p>
+<pre><code>Lexer.tokenize()
+  &rarr; Parser.parse()
+  &rarr; analyze(program)         // semantic analyzer + symbol tables
+  &rarr; generateIR(program)      // TAC generator
+
+return { tokens, program, symbolTables, ir, errors }</code></pre>
+<p>
+Every stage always runs over whatever artifact the previous stage produced,
+even when earlier stages already reported errors (for example, TAC is still
+generated from a program that failed semantic analysis). This keeps every
+intermediate artifact inspectable in one pass, which is what the
+visualization layer relies on. All lexical, syntax, and semantic diagnostics
+are concatenated into a single <code>CompilerError[]</code> in stage order.
+</p>
+
+<h2>6.2 CLI</h2>
+<p>
+<code>src/cli.ts</code> compiles a given <code>.cflow</code> file and prints,
+in order: the token stream, the AST as formatted JSON, one symbol table per
+workflow, the generated TAC for every workflow, and finally any
+lexical/syntax/semantic diagnostics (or a confirmation that none were
+found).
+</p>
+
+<h2>6.3 Web Visualization</h2>
+<p>
+The browser UI (<code>web/app.ts</code>) gained a Symbol Table panel and a
+Three-Address Code panel in Phase 2, alongside the Phase 1 Tokens and AST
+panels. All panels re-render from a single <code>compile()</code> call
+whenever the source text changes, so the tool continues to demonstrate the
+full pipeline observably rather than only the final result.
+</p>
+
+<h1 class="section page-break">7. Testing &amp; Verification</h1>
+
+<p>
+Testing mirrors the compiler stages. Phase 2 added three new suites
+(symbol table, semantic analyzer, IR generator) and extended the
+pipeline suite to exercise the new stages end to end. The full suite
+currently comprises <strong>7 test files and 81 passing tests</strong>
+(<code>npm test</code>, via Vitest).
+</p>
+
+<h2>7.1 Symbol Table &mdash; <span class="small"><code>tests/symbols/symbolTable.test.ts</code></span></h2>
+<ul class="test-list">
+  <li>inserts and looks up a symbol</li>
+  <li>returns <code>undefined</code> for an unknown identifier</li>
+  <li>rejects a duplicate declaration and leaves the original entry intact</li>
+  <li>treats sensor and input declarations as sharing one namespace</li>
+  <li>exposes all inserted symbols</li>
+  <li>keeps separate scopes independent</li>
+</ul>
+
+<h2>7.2 Semantic Analyzer &mdash; <span class="small"><code>tests/semantic/analyzer.test.ts</code></span></h2>
+<ul class="test-list">
+  <li>accepts valid sensor and input declarations with no errors</li>
+  <li>reports a duplicate declaration in the same workflow</li>
+  <li>reports an undefined identifier referenced in a condition</li>
+  <li>reports an undefined identifier used as an action argument</li>
+  <li>does not report undeclared action names (actions are not declarations)</li>
+  <li>does not leak a declaration from one workflow into another</li>
+  <li>resolves a declaration inside nested when/otherwise blocks of the same workflow</li>
+  <li>accepts <code>number &gt; number</code>, <code>number + number</code>, <code>boolean AND boolean</code>, <code>string == string</code>, <code>boolean == boolean</code></li>
+  <li>rejects <code>"hello" &gt; 10</code>, <code>true + 5</code>, <code>10 AND 5</code>, <code>temperature AND 10</code></li>
+  <li>accepts equality between two operands of the same type / rejects equality between operands of different types</li>
+  <li>rejects a non-boolean <code>when</code> condition</li>
+  <li>does not cascade a second error when the condition already failed to resolve</li>
+  <li>accepts unary minus on a number and <code>NOT</code> on a boolean / rejects unary minus on a non-number</li>
+</ul>
+
+<h2>7.3 TAC Generator &mdash; <span class="small"><code>tests/ir/generator.test.ts</code></span></h2>
+<ul class="test-list">
+  <li>lowers arithmetic expressions into named temporaries</li>
+  <li>lowers a comparison into a Binary instruction over materialized operands</li>
+  <li>emits a matching conditional jump and label for a <code>when</code> without <code>otherwise</code></li>
+  <li>lowers a <code>when</code>/<code>otherwise</code> pair into an if/else with a shared end label</li>
+  <li>does not fall through into the otherwise branch when the when branch executes</li>
+  <li>treats an <code>otherwise</code> with no preceding <code>when</code> as unconditional</li>
+  <li>generates independent temp/label numbering for multiple <code>when</code> statements</li>
+  <li>lowers action calls with multiple materialized arguments / with no arguments</li>
+  <li>lowers alert and log statements directly, without temporaries</li>
+  <li>lowers a unary <code>NOT</code> and unary minus</li>
+  <li>lowers nested when/otherwise blocks</li>
+  <li>generates one instruction sequence per workflow, independently numbered</li>
+  <li>formats a full workflow as readable text</li>
+</ul>
+
+<h2>7.4 Pipeline (end-to-end) &mdash; <span class="small"><code>tests/compiler/pipeline.test.ts</code></span></h2>
+<ul class="test-list">
+  <li>compiles the canonical cooling-system example with no errors</li>
+  <li>compiles the canonical order-processing example with no errors</li>
+  <li>reports a syntax error for the missing-brace example</li>
+  <li>reports a lexical error for the invalid-token example</li>
+  <li>reports a semantic error for the undefined-identifier example</li>
+  <li>reports a semantic error for the invalid-type example</li>
+  <li>populates a symbol table per workflow</li>
+  <li>generates TAC for the canonical cooling-system example</li>
+</ul>
+
+<div class="callout">
+Lexer (<code>tests/lexer/lexer.test.ts</code>), parser
+(<code>tests/parser/parser.test.ts</code>), and web UI
+(<code>tests/web/app.test.ts</code>) suites are carried from Phase 1 and
+continue to pass unmodified, confirming Phase 2 did not regress existing
+behavior &mdash; a project requirement whenever a new stage is added on top
+of an existing one.
+</div>
+
+<h1 class="section">8. Required Error Test Cases</h1>
+<p>
+The malformed CodeFlow programs required by the project specification are
+maintained under <code>examples/errors/</code> and exercised by the pipeline
+test suite, each producing a stage-specific, source-located
+<code>CompilerError</code> instead of a generic failure:
+</p>
+<table>
+  <thead><tr><th>File</th><th>Defect</th><th>Diagnostic stage</th></tr></thead>
+  <tbody>
+    <tr><td><code>undefined-identifier.cflow</code></td><td>Condition references a name never declared in the workflow</td><td>semantic</td></tr>
+    <tr><td><code>invalid-type.cflow</code></td><td><code>boolean + number</code> in a <code>when</code> condition</td><td>semantic</td></tr>
+    <tr><td><code>missing-brace.cflow</code></td><td>Unclosed <code>when</code> block</td><td>syntax</td></tr>
+    <tr><td><code>invalid-token.cflow</code></td><td>Illegal character (<code>@</code>) in source</td><td>lexical</td></tr>
+  </tbody>
+</table>
+
+<h1 class="section">9. Limitations &amp; Phase 3 Roadmap</h1>
+<p>
+Phase 2 deliberately does not implement optimization or execution; TAC
+generated today is not yet consumed by anything, and no part of the CLI,
+web UI, or documentation claims otherwise. Phase 3 will add, directly on top
+of the artifacts described in this report:
+</p>
+<ol>
+  <li><strong>Optimizer</strong> (<code>src/optimizer/</code>) &mdash; constant folding (e.g. <code>10 + 20 &rarr; 30</code>), dead-code elimination, and unreachable-code elimination, each tested as input-IR &rarr; optimized-IR with execution semantics verified to be unchanged.</li>
+  <li><strong>Execution engine</strong> (<code>src/runtime/</code>) &mdash; an interpreter over optimized TAC that maintains runtime values, evaluates expressions, follows labels/branches, dispatches actions, emits alerts/logs, and produces an execution trace, driven by sensor/input values supplied at run time (CodeFlow has no real physical sensors).</li>
+  <li><strong>Visualization</strong> &mdash; a before/after IR comparison view and an execution trace panel, completing the artifact list (Source, Tokens, AST, Symbol Table, Semantic Diagnostics, Generated TAC, Optimized TAC, Execution Trace).</li>
+  <li><strong>Comprehensive regression testing</strong> across the full pipeline and final project documentation.</li>
+</ol>
+
+<h1 class="section">10. Conclusion</h1>
+<p>
+Phase 2 turns the Phase 1 syntax prototype into a semantically validated
+compiler front end: a scoped symbol table, a type-checking semantic analyzer
+that enforces every rule from the language specification, and a structured
+Three-Address Code generator that lowers validated CodeFlow programs into an
+inspectable, executable-shaped intermediate representation. All new modules
+are independently unit-tested (33 new tests across the symbol table,
+semantic analyzer, and IR generator suites), the existing lexer/parser/web
+suites continue to pass unmodified, and the full pipeline &mdash; source
+through TAC &mdash; is exercised end to end, including the required
+malformed-program cases. This leaves Phase 3 free to focus purely on
+optimization and execution, without needing to revisit the front end.
+</p>
+
+<footer class="pagefoot">CodeFlow &mdash; Phase 2 Report &mdash; Daksh Arora &mdash; Compiler Design Laboratory (BCSE307P)</footer>
+
+</body>
+</html>

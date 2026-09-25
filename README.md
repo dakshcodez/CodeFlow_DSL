@@ -11,9 +11,12 @@ semantic analysis &rarr; TAC &rarr; optimizer &rarr; execution engine.
 
 See [`CLAUDE.md`](./CLAUDE.md) for full project instructions and
 architecture, [`docs/language-spec.md`](./docs/language-spec.md) for the
-formal language specification, and
+formal language specification,
 [`docs/CodeFlow_Phase1_Proposal.pdf`](./docs/CodeFlow_Phase1_Proposal.pdf)
-for the original Phase 1 proposal and design document.
+for the original Phase 1 proposal and design document, and
+[`docs/CodeFlow_Phase2_Report.pdf`](./docs/CodeFlow_Phase2_Report.pdf) for
+the Phase 2 report covering semantic analysis, the symbol table, and TAC
+generation (source: [`docs/Phase2_Report.html`](./docs/Phase2_Report.html)).
 
 ## Project Status: Phase 2 (in progress, branch `phase2`)
 
