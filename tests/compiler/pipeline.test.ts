@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { compile } from "../../src/compiler/pipeline.js";
-import { formatInstruction } from "../../src/ir/print.js";
+import { formatInstruction, formatWorkflowIR } from "../../src/ir/print.js";
 
 function loadExample(relativePath: string): string {
   return readFileSync(new URL(`../../examples/${relativePath}`, import.meta.url), "utf-8");
@@ -68,5 +68,33 @@ describe("compile pipeline", () => {
       'LOG "Temperature normal"',
       "LABEL L2",
     ]);
+  });
+
+  it("leaves optimizedIR identical to ir when nothing is statically foldable", () => {
+    const { ir, optimizedIR } = compile(loadExample("cooling.cflow"));
+    expect(optimizedIR).toEqual(ir);
+  });
+
+  it("shrinks optimizedIR relative to ir for a program with a statically-known condition", () => {
+    const { ir, optimizedIR } = compile(`workflow "T" { when 10 > 5 { alert "always" } otherwise { log "never" } }`);
+    expect(formatWorkflowIR(ir[0]!)).toBe(
+      [
+        'workflow "T":',
+        "    t1 = 10",
+        "    t2 = 5",
+        "    t3 = t1 > t2",
+        "    IF_FALSE t3 GOTO L1",
+        '    ALERT "always"',
+        "    GOTO L2",
+        "LABEL L1",
+        '    LOG "never"',
+        "LABEL L2",
+      ].join("\n")
+    );
+    expect(formatWorkflowIR(optimizedIR[0]!)).toBe(
+      ["workflow \"T\":", "    t3 = true", "    IF_FALSE t3 GOTO L1", '    ALERT "always"', "    GOTO L2", "LABEL L2"].join(
+        "\n"
+      )
+    );
   });
 });
