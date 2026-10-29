@@ -1,0 +1,677 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>CodeFlow Final Report</title><style>
+  @page { size: A4; margin: 22mm 18mm 22mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Georgia", "Times New Roman", serif;
+    color: #1a1a1a;
+    font-size: 11pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .titlepage {
+    height: 250mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .titlepage .kicker {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 11pt;
+    color: #555;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    margin-bottom: 18px;
+  }
+  .titlepage h1 {
+    font-size: 34pt;
+    margin: 0 0 6px 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+  }
+  .titlepage h2 {
+    font-size: 16pt;
+    font-weight: 400;
+    color: #333;
+    margin: 0 0 40px 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    max-width: 480px;
+  }
+  .titlepage .divider {
+    width: 70px;
+    height: 3px;
+    background: #b8321f;
+    margin: 24px 0 30px 0;
+  }
+  .titlepage .meta {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    color: #222;
+    line-height: 2;
+  }
+  .titlepage .meta strong { font-weight: 600; }
+  .titlepage .footer {
+    position: absolute;
+    bottom: 26mm;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 9pt;
+    color: #888;
+  }
+  h1.section {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 18pt;
+    border-bottom: 2px solid #b8321f;
+    padding-bottom: 6px;
+    margin-top: 30px;
+    margin-bottom: 14px;
+    page-break-after: avoid;
+  }
+  h2 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 13pt;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    color: #b8321f;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 11.5pt;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  p { margin: 6px 0 10px 0; text-align: justify; }
+  code {
+    font-family: "SF Mono", "Consolas", monospace;
+    background: #f1efe9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 9.5pt;
+  }
+  pre {
+    font-family: "SF Mono", "Consolas", monospace;
+    background: #f6f5f0;
+    border: 1px solid #ddd8c8;
+    border-left: 3px solid #b8321f;
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 9pt;
+    line-height: 1.45;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    page-break-inside: auto;
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0 16px 0;
+    font-size: 9.5pt;
+    page-break-inside: auto;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #2b2b2b;
+    color: #fff;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
+    font-size: 9pt;
+  }
+  tr:nth-child(even) td { background: #f8f7f3; }
+  ul, ol { margin: 6px 0 12px 0; padding-left: 22px; }
+  li { margin-bottom: 3px; }
+  .badge {
+    display: inline-block;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+  .badge-new { background: #dff0d8; color: #2e6b1f; }
+  .badge-carried { background: #e2e2e2; color: #444; }
+  .badge-future { background: #f5e2c8; color: #8a5a00; }
+  .test-list { columns: 1; font-size: 9.5pt; }
+  .callout {
+    background: #fdf3e3;
+    border: 1px solid #ecd9a8;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 9.5pt;
+    margin: 10px 0;
+  }
+  .pipeline {
+    font-family: "SF Mono", Consolas, monospace;
+    background: #232323;
+    color: #eee;
+    padding: 14px 16px;
+    border-radius: 5px;
+    font-size: 9.5pt;
+    text-align: center;
+    line-height: 2;
+    margin: 12px 0 18px 0;
+  }
+  .pipeline .arrow { color: #b8321f; margin: 0 6px; }
+  .pipeline .done { color: #8fd67a; }
+  .pipeline .future { color: #888; }
+  .toc { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .page-break { page-break-before: always; }
+  .small { font-size: 9pt; color: #555; }
+  footer.pagefoot {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 8pt;
+    color: #999;
+    text-align: center;
+    margin-top: 26px;
+    border-top: 1px solid #ddd;
+    padding-top: 6px;
+  }
+pre{page-break-inside:avoid} tr{page-break-inside:avoid} .titlepage{height:245mm} .toc{page-break-after:always}</style></head><body><div class="titlepage">
+  <div class="kicker">Vellore Institute of Technology, Vellore &middot; SCOPE</div>
+  <div class="kicker">Compiler Design Laboratory &middot; BCSE307P</div>
+  <h1>CodeFlow</h1>
+  <h2>A Domain-Specific Language and Compiler for Workflow Automation</h2>
+  <div class="divider"></div>
+  <h2 style="font-size:20pt; font-weight:600; color:#1a1a1a; margin-bottom:6px;">Final Project Report</h2>
+  <h2 style="margin-top:0;">Phases 1, 2 &amp; 3 &mdash; Design, Core Compiler Construction, Optimization &amp; Execution</h2>
+  <div class="meta">
+    <div><strong>Name:</strong> Daksh Arora</div>
+    <div><strong>Registration No.:</strong> 24BCI0259</div>
+    <div><strong>Programme:</strong> B.Tech CSE (Information Security)</div>
+    <div><strong>Project type:</strong> Individual Project</div>
+    <div><strong>Implementation:</strong> TypeScript / Node.js</div>
+    <div><strong>Date:</strong> October 29, 2026</div>
+    <div><strong>GitHub:</strong> https://github.com/dakshcodez/CodeFlow_DSL</div>
+  </div>
+</div>
+
+<div class="toc"><h1 class="section" style="margin-top:0">Contents</h1><ol>
+<li>Introduction &amp; Objectives</li>
+<li>The CodeFlow Language</li>
+<li>Compiler Architecture</li>
+<li>Phase 1 &mdash; Lexer, Parser &amp; AST</li>
+<li>Phase 2 &mdash; Symbol Table, Semantic Analysis &amp; TAC Generation</li>
+<li>Phase 3 &mdash; Optimization &amp; Execution Engine</li>
+<li>Pipeline, CLI &amp; Browser Visualization</li>
+<li>End-to-End Worked Examples</li>
+<li>Testing &amp; Verification</li>
+<li>Requirements Compliance, Limitations &amp; Future Work</li>
+<li>Conclusion</li></ol></div>
+
+<h1 class="section">1. Introduction &amp; Objectives</h1>
+<p>Many automation rules &mdash; &ldquo;if the temperature exceeds 35, raise an alert and start the fan&rdquo; &mdash; are written as ad-hoc configuration or scripts that are evaluated directly, with no static checking. <strong>CodeFlow</strong> is a small, statically typed, textual Domain-Specific Language for exactly this kind of conditional workflow logic, together with a real compiler and execution environment implemented in TypeScript. It is deliberately <em>not</em> a general-purpose language and is not presented as novel research or a production workflow platform; its purpose is to demonstrate every stage of a compiler on a deliberately constrained language.</p>
+<p>The project was delivered in three phases:</p>
+<table><thead><tr><th>Phase</th><th>Theme</th><th>Delivered</th></tr></thead><tbody>
+<tr><td>1</td><td>Problem definition &amp; system design</td><td>27-page proposal, language specification, grammar, architecture; lexer, recursive-descent parser and AST prototype</td></tr>
+<tr><td>2</td><td>Core compiler construction</td><td>Symbol table, semantic analyzer (scope + type checking), Three-Address Code generator, layered diagnostics</td></tr>
+<tr><td>3</td><td>Optimization, execution &amp; integration</td><td>Constant folding, unreachable- and dead-code elimination, TAC interpreter with runtime errors, full visualization, end-to-end tests</td></tr></tbody></table>
+<p>The complete implemented pipeline is:</p>
+<div class="pipeline">Source <span class="arrow">&rarr;</span> Lexer <span class="arrow">&rarr;</span> Tokens <span class="arrow">&rarr;</span> Recursive-Descent Parser <span class="arrow">&rarr;</span> AST <span class="arrow">&rarr;</span> Semantic Analyzer + Symbol Table <span class="arrow">&rarr;</span> Three-Address Code <span class="arrow">&rarr;</span> Optimizer <span class="arrow">&rarr;</span> Optimized TAC <span class="arrow">&rarr;</span> Execution Engine <span class="arrow">&rarr;</span> Trace</div>
+<p>Two concerns span the pipeline: a common <code>CompilerError</code> diagnostic model, and a browser-based Compiler Explorer that exposes every intermediate artifact.</p>
+
+<h1 class="section">2. The CodeFlow Language</h1>
+<h2>2.1 Lexical Structure</h2>
+<p><strong>Keywords:</strong> <code>workflow sensor input when otherwise action alert log number string boolean AND OR NOT true false</code>. <strong>Identifiers:</strong> <code>(letter|_)(letter|digit|_)*</code>, not a keyword. <strong>Literals:</strong> numbers (<code>35</code>, <code>2.5</code>), double-quoted strings, and <code>true</code>/<code>false</code>. The only types are <code>number</code>, <code>string</code> and <code>boolean</code>.</p>
+<h2>2.2 Grammar (EBNF)</h2>
+<pre><code>program       ::= { workflowDecl }
+workflowDecl  ::= "workflow" STRING "{" { declaration } { statement } "}"
+declaration   ::= ("sensor" | "input") IDENT ":" type
+type          ::= "number" | "string" | "boolean"
+statement     ::= whenStmt | otherwiseStmt | actionStmt | alertStmt | logStmt
+whenStmt      ::= "when" expression block
+otherwiseStmt ::= "otherwise" block
+block         ::= "{" { statement } "}"
+actionStmt    ::= "action" IDENT "(" [ argList ] ")"
+alertStmt     ::= "alert" STRING          logStmt ::= "log" STRING
+argList       ::= expression { "," expression }
+expression    ::= orExpr
+orExpr        ::= andExpr { "OR" andExpr }
+andExpr       ::= notExpr { "AND" notExpr }
+notExpr       ::= [ "NOT" ] relExpr
+relExpr       ::= addExpr [ relOp addExpr ]
+relOp         ::= ">" | "<" | ">=" | "<=" | "==" | "!="
+addExpr       ::= mulExpr { ("+" | "-") mulExpr }
+mulExpr       ::= unaryExpr { ("*" | "/") unaryExpr }
+unaryExpr     ::= [ "-" ] primary
+primary       ::= NUMBER | STRING | BOOLEAN | IDENT | "(" expression ")"</code></pre>
+<h2>2.3 Operator Precedence</h2>
+<table><thead><tr><th>Level</th><th>Operators</th><th>Associativity</th><th>Parser function</th></tr></thead><tbody>
+<tr><td>1 (lowest)</td><td><code>OR</code></td><td>Left</td><td><code>parseOr</code></td></tr>
+<tr><td>2</td><td><code>AND</code></td><td>Left</td><td><code>parseAnd</code></td></tr>
+<tr><td>3</td><td><code>NOT</code></td><td>Right</td><td><code>parseNot</code></td></tr>
+<tr><td>4</td><td><code>&gt; &lt; &gt;= &lt;= == !=</code></td><td>Left</td><td><code>parseRelational</code></td></tr>
+<tr><td>5</td><td><code>+ -</code></td><td>Left</td><td><code>parseAdditive</code></td></tr>
+<tr><td>6</td><td><code>* /</code></td><td>Left</td><td><code>parseMultiplicative</code></td></tr>
+<tr><td>7 (highest)</td><td>unary <code>-</code></td><td>Right</td><td><code>parseUnary</code></td></tr></tbody></table>
+<h2>2.4 Semantics in Brief</h2>
+<ul><li>A <code>workflow</code> is the only scope; <code>sensor</code>/<code>input</code> declarations are visible only inside it.</li>
+<li>A <code>when</code> condition must be <code>boolean</code>. An <code>otherwise</code> immediately following a <code>when</code> runs only if that condition was false.</li>
+<li><code>action</code>, <code>alert</code> and <code>log</code> are observable runtime effects, not real external side effects. Sensor/input values are supplied at run time.</li></ul>
+<h2>2.5 Canonical Programs</h2>
+<pre><code>workflow "CoolingSystem" {
+    sensor temperature : number
+
+    when temperature &gt; 35 {
+        alert "High temperature"
+        action start_fan()
+    }
+
+    otherwise {
+        log "Temperature normal"
+    }
+}
+
+workflow "OrderProcessing" {
+    input orderAmount : number
+
+    when orderAmount &gt; 5000 {
+        action fraud_check()
+    }
+
+    when orderAmount &gt; 10000 {
+        action manager_approval()
+    }
+
+    action process_payment()
+}</code></pre>
+<h2>2.6 Scope Boundaries</h2>
+<p>Functions, loops, recursion, arrays, objects, modules, concurrency, networking, persistence, authentication, register allocation and native code generation are explicitly out of scope, keeping the DSL small enough to finish and explain.</p>
+
+<h1 class="section">3. Compiler Architecture</h1>
+<table><thead><tr><th>Module</th><th>Location</th><th>Input &rarr; Output</th><th>Phase</th></tr></thead><tbody>
+<tr><td>Lexer</td><td><code>src/lexer/</code></td><td>source &rarr; <code>Token[]</code></td><td>1</td></tr>
+<tr><td>Parser</td><td><code>src/parser/</code></td><td><code>Token[]</code> &rarr; AST</td><td>1</td></tr>
+<tr><td>AST nodes</td><td><code>src/ast/</code></td><td>discriminated unions</td><td>1</td></tr>
+<tr><td>Diagnostics</td><td><code>src/diagnostics/</code></td><td>common <code>CompilerError</code></td><td>1 (extended 2, 3)</td></tr>
+<tr><td>Symbol table</td><td><code>src/symbols/</code></td><td>per-workflow scope</td><td>2</td></tr>
+<tr><td>Semantic analyzer</td><td><code>src/semantic/</code></td><td>AST &rarr; symbol tables + errors</td><td>2</td></tr>
+<tr><td>TAC generator / printer</td><td><code>src/ir/</code></td><td>AST &rarr; <code>IRInstruction[]</code></td><td>2</td></tr>
+<tr><td>Optimizer</td><td><code>src/optimizer/</code></td><td>TAC &rarr; optimized TAC</td><td>3</td></tr>
+<tr><td>Execution engine</td><td><code>src/runtime/</code></td><td>optimized TAC + inputs &rarr; trace</td><td>3</td></tr>
+<tr><td>Pipeline, CLI, web UI</td><td><code>src/compiler/</code>, <code>src/cli.ts</code>, <code>web/</code></td><td>wiring &amp; visualization</td><td>1&ndash;3</td></tr></tbody></table>
+<p>Design rules enforced throughout: stages communicate only through typed artifacts; the parser performs no symbol lookup or type checking; the optimizer never sees source text; the runtime executes TAC rather than reparsing source; source locations flow from tokens into AST nodes, IR instructions and diagnostics. The compiler is roughly 2,100 lines of TypeScript in <code>src/</code>, plus a 184-line browser front end and about 1,500 lines of tests.</p>
+<h1 class="section">4. Phase 1 &mdash; Lexer, Parser &amp; AST</h1>
+<p>Phase 1 produced the 27-page proposal and design document (problem statement, motivation, objectives, scope, language specification, requirements, methodology, architecture, module description, technology stack) and a prototype covering <em>source &rarr; tokens &rarr; AST</em> with basic syntax validation.</p>
+<h2>4.1 Lexer</h2>
+<p><code>src/lexer/lexer.ts</code> (245 lines) is a hand-written scanner producing <code>Token = { kind, lexeme, line, column, start, end }</code> with an explicit <code>TokenKind</code> enumeration, so the parser never compares raw strings. It skips whitespace, distinguishes keywords from identifiers, and recognizes numbers (integer and decimal), strings, booleans, operators and delimiters. It reports three classes of lexical error &mdash; <em>illegal characters</em>, <em>malformed numeric literals</em> and <em>unterminated strings</em> &mdash; each with line and column, without aborting the scan.</p>
+<h2>4.2 Recursive-Descent Parser</h2>
+<p><code>src/parser/parser.ts</code> (436 lines) has one method per grammar production (<code>parseProgram</code>, <code>parseWorkflow</code>, <code>parseDeclaration</code>, <code>parseStatement</code>, <code>parseWhen</code>, <code>parseOtherwise</code>, <code>parseAction</code>, <code>parseAlert</code>, <code>parseLog</code>, then the expression chain of Section 2.3). Precedence and associativity are encoded structurally by the call chain rather than by ad-hoc tables. The grammar is LL(1), so one token of lookahead suffices. Syntax errors report what was expected, what was found, and where (e.g. <em>Expected '}' to close a block but found end of input</em>), and the parser keeps going after an error so several can be reported in one run.</p>
+<h2>4.3 AST</h2>
+<p>The AST (<code>src/ast/nodes.ts</code>, 112 lines) is a discriminated union tagged by <code>kind</code>, each node carrying a source location.</p>
+<table><thead><tr><th>Node</th><th>Fields</th></tr></thead><tbody>
+<tr><td><code>Program</code></td><td>workflows</td></tr><tr><td><code>Workflow</code></td><td>name, declarations, statements</td></tr>
+<tr><td><code>Declaration</code></td><td>declKind (sensor|input), name, type</td></tr>
+<tr><td><code>WhenStatement</code> / <code>OtherwiseStatement</code></td><td>condition, body / body</td></tr>
+<tr><td><code>ActionStatement</code></td><td>name, args</td></tr><tr><td><code>AlertStatement</code> / <code>LogStatement</code></td><td>message</td></tr>
+<tr><td><code>LiteralExpr</code> / <code>IdentifierExpr</code></td><td>literalType, value / name</td></tr>
+<tr><td><code>UnaryExpr</code> / <code>BinaryExpr</code></td><td>operator, operand(s)</td></tr></tbody></table>
+
+
+<h1 class="section page-break">5. Phase 2 &mdash; Symbol Table, Semantic Analysis &amp; TAC</h1>
+<p>Phase 2 turned the syntax prototype into a semantically validated front end that emits an intermediate representation.</p>
+<h2>5.1 Symbol Table</h2>
+<p><code>SymbolTable</code> (<code>src/symbols/symbolTable.ts</code>, 55 lines) records <code>name</code>, <code>kind</code> (sensor/input), <code>type</code> and <code>scope</code>, with <code>insert</code> and <code>lookup</code> operations. Because a workflow is the only scope boundary and declarations never nest, one flat <code>Map</code> per workflow is a correct and simple model; a declaration in one workflow is never visible in another. A duplicate <code>insert</code> is rejected and leaves the original entry intact.</p>
+<h3>5.3.2 Semantic Analyzer</h3>
+
+<p>
+<code>analyze(program)</code> (<code>src/semantic/analyzer.ts</code>,
+217 lines) is the core new component of Phase 2. It performs a single
+recursive walk over the AST, enforcing every property the context-free
+grammar cannot express on its own: declaration checking, duplicate detection,
+scope checking, and a full static type-checking pass that assigns a
+<code>PrimitiveType</code> to every expression node.
+</p>
+
+<h3>5.2.1 Declaration &amp; Scope Checking</h3>
+<p>
+Every <code>IdentifierExpr</code> is resolved against the enclosing
+workflow's <code>SymbolTable</code>. An identifier with no matching
+declaration is reported as <code>Undefined identifier '&lt;name&gt;'</code>
+at its source location. Because CodeFlow has exactly one scope level
+(the workflow), there is no scope-chain walk &mdash; resolution is a single
+<code>lookup()</code> call against the current workflow's table, and a
+declaration made in one workflow is never visible from another (verified by
+the <em>"does not leak a declaration from one workflow into another"</em>
+test).
+</p>
+
+<h3>5.2.2 Duplicate Declaration Checking</h3>
+<p>
+While populating each workflow's symbol table, a second declaration reusing
+an already-declared name is reported as
+<code>Duplicate declaration of '&lt;name&gt;' in workflow "&lt;workflow&gt;"</code>,
+and the original entry is left untouched in the table (so subsequent lookups
+still resolve against the first, valid declaration).
+</p>
+
+<h3>5.2.3 Type Checking</h3>
+<p>
+The analyzer performs bottom-up type inference over every <code>Expr</code>,
+returning a <code>PrimitiveType | undefined</code> (<code>undefined</code>
+marks an expression that already failed to type-check, which stops errors
+from cascading further up the same expression tree). Successfully typed
+expressions are recorded in <code>SemanticResult.types: Map&lt;Expr,
+PrimitiveType&gt;</code> for potential reuse by later stages.
+</p>
+
+<table>
+  <thead><tr><th>Operator class</th><th>Operators</th><th>Required operand type(s)</th><th>Result type</th></tr></thead>
+  <tbody>
+    <tr><td>Arithmetic</td><td><code>+ - * /</code></td><td><code>number, number</code></td><td><code>number</code></td></tr>
+    <tr><td>Relational</td><td><code>&gt; &lt; &gt;= &lt;=</code></td><td><code>number, number</code></td><td><code>boolean</code></td></tr>
+    <tr><td>Equality</td><td><code>== !=</code></td><td>both operands the <em>same</em> primitive type</td><td><code>boolean</code></td></tr>
+    <tr><td>Logical (binary)</td><td><code>AND OR</code></td><td><code>boolean, boolean</code></td><td><code>boolean</code></td></tr>
+    <tr><td>Logical (unary)</td><td><code>NOT</code></td><td><code>boolean</code></td><td><code>boolean</code></td></tr>
+    <tr><td>Arithmetic (unary)</td><td><code>-</code></td><td><code>number</code></td><td><code>number</code></td></tr>
+  </tbody>
+</table>
+
+<p>
+Additionally, the condition expression of every <code>when</code> statement
+is required to type as <code>boolean</code>
+(<code>The condition of a 'when' statement must be of type 'boolean', but
+found '&lt;type&gt;'</code>); a non-boolean condition such as
+<code>when temperature { ... }</code> is rejected even though
+<code>temperature</code> itself is a validly-declared identifier.
+</p>
+
+<h3>Accepted programs (excerpt from the test suite)</h3>
+<pre><code>number &gt; number        // relational, numeric operands
+number + number        // arithmetic
+boolean AND boolean    // logical
+string == string       // equality, matching types
+boolean == boolean     // equality, matching types</code></pre>
+
+<h3>Rejected programs (excerpt from the test suite)</h3>
+<pre><code>"hello" &gt; 10           // relational requires number, number
+true + 5               // arithmetic requires number, number
+10 AND 5               // logical requires boolean, boolean
+temperature AND 10     // temperature: number, AND requires boolean</code></pre>
+
+<h3>5.2.4 Error Recovery</h3>
+<p>
+Analysis does not stop at the first diagnostic. Mirroring the parser's own
+recovery strategy, the analyzer keeps walking the remaining declarations,
+statements, and workflows after reporting an error, so a single compilation
+pass can surface every semantic problem in a program rather than forcing the
+user to fix and recompile one error at a time. Errors are still prevented
+from <em>cascading</em> within one expression: once an operand fails to
+resolve or type-check, the enclosing expression returns <code>undefined</code>
+instead of guessing a type and reporting a second, spurious error on top of
+the first.
+</p>
+
+<h3>5.2.5 Diagnostic Output</h3>
+<p>
+Every semantic diagnostic is emitted as a <code>CompilerError</code> with
+<code>stage: "semantic"</code> and the offending node's <code>line</code>/
+<code>column</code>, consistent with the shared cross-cutting error model
+used by the lexer and parser:
+</p>
+<pre><code>type CompilerError = {
+  stage: "lexical" | "syntax" | "semantic" | "runtime";
+  message: string;
+  line?: number;
+  column?: number;
+  length?: number;
+};</code></pre>
+
+<h2>5.3 Three-Address Code Generation</h2>
+
+<h3>5.3.1 Instruction Model</h3>
+<p>
+<code>src/ir/instructions.ts</code> defines TAC as a discriminated union
+(<code>IRInstruction</code>) of nine structured instruction shapes, rather
+than free-form strings, so the instruction stream stays type-safe and
+straightforward for the Phase 3 optimizer and execution engine to pattern
+match over:
+</p>
+<pre><code>type IRInstruction =
+  | AssignInstruction            // dest = value
+  | BinaryInstruction            // dest = left OP right
+  | UnaryInstruction             // dest = OP operand
+  | ConditionalJumpInstruction   // IF_FALSE cond GOTO label
+  | JumpInstruction              // GOTO label
+  | LabelInstruction             // LABEL label
+  | CallInstruction              // CALL name(args)
+  | AlertInstruction             // ALERT "message"
+  | LogInstruction;              // LOG "message"</code></pre>
+
+<p>
+Operands are likewise a closed union:
+</p>
+<pre><code>type Operand =
+  | { kind: "Temp";  id: number }               // compiler-generated temporary
+  | { kind: "Var";   name: string }              // a declared sensor/input
+  | { kind: "Const"; value: number | string | boolean }; // a literal value</code></pre>
+
+<p>
+The generator always materializes <code>Var</code> and <code>Const</code>
+operands into a <code>Temp</code> via an <code>Assign</code> instruction
+before they are used in any computation, so every instruction only ever
+references the result of at most one prior operation &mdash; true
+three-address discipline, with no instruction doing more than "one
+operator's worth" of work. Each workflow lowers to its own
+<code>WorkflowIR = { workflowName, instructions: IRInstruction[] }</code>.
+</p>
+
+<h3>5.3.2 Generation Algorithm</h3>
+<p>
+<code>generateIR(program)</code> (<code>src/ir/generator.ts</code>,
+152 lines) lowers each workflow's AST independently &mdash; workflows never
+call one another in CodeFlow, so per-workflow temporary (<code>t1, t2,
+...</code>) and label (<code>L1, L2, ...</code>) counters simply reset at the
+start of each workflow.
+</p>
+<ul>
+  <li><strong>Expressions</strong> always lower to a <code>Temp</code> operand: a <code>LiteralExpr</code> or <code>IdentifierExpr</code> is first assigned into a fresh temporary, then combined through <code>Binary</code>/<code>Unary</code> instructions whose operands are themselves temporaries.</li>
+  <li><strong><code>when</code> alone</strong> lowers to: evaluate the condition, <code>IfFalse cond GOTO endLabel</code>, the body, then <code>Label endLabel</code>.</li>
+  <li><strong><code>when</code> immediately followed by <code>otherwise</code></strong> in the same statement list lowers to a structured if/else: <code>IfFalse cond GOTO elseLabel</code>, the <code>when</code> body, <code>Goto endLabel</code>, <code>Label elseLabel</code>, the <code>otherwise</code> body, <code>Label endLabel</code>. This pairing is purely structural &mdash; adjacency of the two statements in the list &mdash; and introduces no new grammar rule, matching the language's definition of <code>otherwise</code> as a fallback executed only when the immediately preceding <code>when</code>'s condition is false.</li>
+  <li><strong>An orphaned <code>otherwise</code></strong> (no directly preceding <code>when</code>) has no condition to fall back on, so its body is lowered unconditionally.</li>
+  <li><strong><code>action</code>/<code>alert</code>/<code>log</code></strong> lower directly to <code>Call</code>/<code>Alert</code>/<code>Log</code> instructions; action arguments are lowered like any other expression and passed as a list of operands.</li>
+</ul>
+
+<h3>5.3.3 Worked Example</h3>
+<p>For the canonical example program <code>examples/cooling.cflow</code>:</p>
+<pre><code>workflow "CoolingSystem" {
+    sensor temperature : number
+
+    when temperature &gt; 35 {
+        alert "High temperature"
+        action start_fan()
+    }
+
+    otherwise {
+        log "Temperature normal"
+    }
+}</code></pre>
+
+<p>the generator emits (as rendered by the CLI / <code>formatWorkflowIR</code>):</p>
+
+<pre><code>workflow "CoolingSystem":
+    t1 = temperature
+    t2 = 35
+    t3 = t1 &gt; t2
+    IF_FALSE t3 GOTO L1
+    ALERT "High temperature"
+    CALL start_fan()
+    GOTO L2
+LABEL L1
+    LOG "Temperature normal"
+LABEL L2</code></pre>
+
+<p>
+<code>src/ir/print.ts</code> (43 lines) is a pure formatter that renders this
+human-readable text from a <code>WorkflowIR</code>; it is consulted only by
+the CLI and the web visualization and is never read back by any compiler
+stage, preserving the rule that IR consumers act on the structured
+<code>IRInstruction[]</code>, not on its printed form.
+</p>
+
+<h1 class="section page-break">6. Phase 3 &mdash; Optimization &amp; Execution Engine</h1>
+<p>Phase 3 completed the pipeline: the TAC is now optimized and then actually executed.</p>
+<h2>6.1 Optimizer</h2>
+<p><code>src/optimizer/optimizer.ts</code> (270 lines) implements three passes over each workflow's <code>IRInstruction[]</code>, composed by <code>optimizeWorkflow</code> in the order fold &rarr; unreachable &rarr; dead. Each pass is an exported, independently testable function.</p>
+<table><thead><tr><th>Pass</th><th>What it does</th><th>Key design points</th></tr></thead><tbody>
+<tr><td><strong>Constant folding</strong> <code>foldConstants</code></td><td>Replaces <code>Binary</code>/<code>Unary</code> instructions whose operands are compile-time constants with a single <code>Assign</code> of the result (<code>10 + 20 &rarr; 30</code>, <code>5 &gt; 3 &rarr; true</code>).</td><td>Constant knowledge is tracked per temporary and reset at every <code>Label</code> (a control-flow merge point). Sensor/input <code>Var</code> operands are never constant. Division by a constant zero is deliberately left unfolded so the runtime reports it.</td></tr>
+<tr><td><strong>Unreachable-code elimination</strong> <code>eliminateUnreachableCode</code></td><td>Builds a small control-flow graph over instruction indices (fall-through plus <code>Goto</code>/<code>IfFalse</code> edges) and keeps only instructions reachable from the start by breadth-first search.</td><td>When an <code>IfFalse</code> condition is a known boolean (thanks to folding), only the edge it can actually take is followed, so a statically false <code>when</code> loses its body.</td></tr>
+<tr><td><strong>Dead-code elimination</strong> <code>eliminateDeadCode</code></td><td>Removes <code>Assign</code>/<code>Binary</code>/<code>Unary</code> instructions whose result temporary is never read.</td><td>One backward pass suffices because CodeFlow has no loops: every jump target lies after its jump and each temporary has one static definition.</td></tr></tbody></table>
+<p>Register allocation, instruction scheduling and inter-procedural optimization are out of scope and not implemented.</p>
+<h3>Before / after: <code>examples/dead-code.cflow</code></h3>
+<pre><code>workflow "DeadCodeDemo" {
+    sensor temperature : number
+    when temperature &gt; 10 + 20 { alert "High temperature" }
+    when 5 &gt; 3                 { log "Always runs" }
+    when 2 &gt; 9                 { action never_called() }
+}</code></pre>
+<table><thead><tr><th>Generated TAC (20 instructions)</th><th>Optimized TAC (12 instructions)</th></tr></thead><tbody><tr><td><pre style="border:none;background:none;padding:0"><code>t1 = temperature
+t2 = 10
+t3 = 20
+t4 = t2 + t3
+t5 = t1 &gt; t4
+IF_FALSE t5 GOTO L1
+ALERT "High temperature"
+LABEL L1
+t6 = 5
+t7 = 3
+t8 = t6 &gt; t7
+IF_FALSE t8 GOTO L2
+LOG "Always runs"
+LABEL L2
+t9 = 2
+t10 = 9
+t11 = t9 &gt; t10
+IF_FALSE t11 GOTO L3
+CALL never_called()
+LABEL L3</code></pre></td><td><pre style="border:none;background:none;padding:0"><code>t1 = temperature
+t4 = 30
+t5 = t1 &gt; t4
+IF_FALSE t5 GOTO L1
+ALERT "High temperature"
+LABEL L1
+t8 = true
+IF_FALSE t8 GOTO L2
+LOG "Always runs"
+LABEL L2
+t11 = false
+IF_FALSE t11 GOTO L3
+LABEL L3</code></pre></td></tr></tbody></table>
+<p><code>10 + 20</code> folded to <code>t4 = 30</code> and the now-unused <code>t2</code>, <code>t3</code> (and <code>t6</code>, <code>t7</code>, <code>t9</code>, <code>t10</code>) were removed as dead code; the <code>CALL never_called()</code> body of the statically false <code>when 2 &gt; 9</code> was removed as unreachable. Running it with <code>temperature = 40</code> yields <code>ALERT: High temperature</code> and <code>LOG: Always runs</code>, identical to the unoptimized program.</p>
+<div class="callout"><strong>Known limitation.</strong> A conditional jump on a known constant (<code>t8 = true; IF_FALSE t8 GOTO L2</code>) is not rewritten into an unconditional jump or removed; only the branch bodies that can never run are removed. This is semantically safe and the interpreter handles it, but it is a missed optimization.</div>
+
+<h2>6.2 Execution Engine</h2>
+<p><code>src/runtime/interpreter.ts</code> (238 lines) interprets the optimized TAC of each workflow with a program counter, a map of temporaries, and a label index. It supplies sensor/input values from a user-provided <code>RuntimeInputs</code> record (CodeFlow has no real sensors or actuators).</p>
+<table><thead><tr><th>Instruction</th><th>Runtime behaviour</th></tr></thead><tbody>
+<tr><td><code>Assign</code>, <code>Binary</code>, <code>Unary</code></td><td>Evaluate operands and store the result in the destination temporary</td></tr>
+<tr><td><code>IfFalse</code> / <code>Goto</code> / <code>Label</code></td><td>Branch by setting the program counter from the label index; labels are no-ops</td></tr>
+<tr><td><code>Call</code></td><td>Records an <code>Action</code> effect with evaluated arguments</td></tr>
+<tr><td><code>Alert</code> / <code>Log</code></td><td>Records an <code>Alert</code> / <code>Log</code> effect</td></tr></tbody></table>
+<p>Execution produces a <code>WorkflowExecutionResult = { workflowName, trace, errors }</code>. Actions are observable effects (<code>ACTION: start_fan()</code>), not real side effects. Runtime errors halt the workflow, are recorded as a <code>"runtime"</code>-stage <code>CompilerError</code> with location, and the trace produced so far is preserved. Detected runtime errors are: a missing input value, a supplied value whose type differs from the declared type, division by zero, and operand type mismatches in operators.</p>
+
+<h1 class="section">7. Pipeline, CLI &amp; Browser Visualization</h1>
+<h2>7.1 Pipeline API</h2>
+<p><code>src/compiler/pipeline.ts</code> (65 lines) exposes two functions:</p>
+<pre><code>compile(source)            // lex &rarr; parse &rarr; analyze &rarr; generateIR &rarr; optimize
+  &rarr; { tokens, program, symbolTables, ir, optimizedIR, errors }
+run(source, runtimeInputs) // compile(), then execute(optimizedIR, inputs, symbolTables)
+  &rarr; CompileResult + execution[]</code></pre>
+<p>Every stage runs over whatever the previous stage produced, even if earlier stages reported errors, so that all artifacts and as many diagnostics as possible are visible in one pass. Execution is a separate step because compiling never needs runtime values.</p>
+<h2>7.2 Command-Line Interface</h2>
+<pre><code>npm run compile -- examples/cooling.cflow
+npm run compile -- examples/cooling.cflow '{"temperature": 38}'</code></pre>
+<p>Prints tokens, AST (JSON), per-workflow symbol tables, TAC, optimized TAC, diagnostics, and &mdash; if a JSON object of inputs is given &mdash; the execution trace.</p>
+<h2>7.3 Compiler Explorer (Browser)</h2>
+<p>The web interface (<code>web/index.html</code>, <code>styles.css</code>, <code>app.ts</code>) is a lightweight, dependency-free page bundled with esbuild. It shows Source, Runtime Inputs (JSON), Tokens, AST, Symbol Table, Three-Address Code, Optimized Three-Address Code, Errors and Execution Trace side by side. It exists to make compiler internals observable, not to be a workflow dashboard.</p>
+<div style="height:620px;overflow:hidden;border:1px solid #ccc;border-radius:4px;text-align:center;background:#111"><img src="ui_crop.png" style="width:100%;margin-top:-80px"></div>
+<p class="small" style="text-align:center">Figure 1 &mdash; Compiler Explorer running the CoolingSystem example with <code>temperature = 38</code> (upper part of the page; screenshot of the actual build).</p>
+
+<h1 class="section">8. End-to-End Worked Examples</h1>
+<h2>8.1 CoolingSystem</h2>
+<p><strong>Symbol table:</strong> <code>temperature &nbsp; sensor &nbsp; number</code>. <strong>Generated TAC</strong> (the optimizer finds nothing to change here, so the optimized TAC is identical):</p>
+<pre><code>workflow "CoolingSystem":
+    t1 = temperature
+    t2 = 35
+    t3 = t1 &gt; t2
+    IF_FALSE t3 GOTO L1
+    ALERT "High temperature"
+    CALL start_fan()
+    GOTO L2
+LABEL L1
+    LOG "Temperature normal"
+LABEL L2</code></pre>
+<table><thead><tr><th>Inputs</th><th>Execution trace</th></tr></thead><tbody>
+<tr><td><code>{"temperature": 38}</code></td><td><code>ALERT: High temperature</code>, <code>ACTION: start_fan()</code></td></tr>
+<tr><td><code>{"temperature": 20}</code></td><td><code>LOG: Temperature normal</code></td></tr></tbody></table>
+<h2>8.2 OrderProcessing</h2>
+<pre><code>t1 = orderAmount        t4 = orderAmount
+t2 = 5000               t5 = 10000
+t3 = t1 &gt; t2            t6 = t4 &gt; t5
+IF_FALSE t3 GOTO L1     IF_FALSE t6 GOTO L2
+CALL fraud_check()      CALL manager_approval()
+LABEL L1                LABEL L2
+                        CALL process_payment()</code></pre>
+<p>With <code>{"orderAmount": 12000}</code> the trace is <code>ACTION: fraud_check()</code>, <code>ACTION: manager_approval()</code>, <code>ACTION: process_payment()</code>.</p>
+<h2>8.3 Runtime errors</h2>
+<table><thead><tr><th>Program / inputs</th><th>Diagnostic</th></tr></thead><tbody>
+<tr><td><code>when a / b &gt; 2 { ... }</code> with <code>{"a":4,"b":0}</code></td><td><code>Runtime error at line 4, column 10: Division by zero</code></td></tr>
+<tr><td>CoolingSystem with <code>{"temperature":"hot"}</code></td><td><code>Runtime error at line 4, column 10: Type mismatch for 'temperature': expected number but received string ("hot")</code></td></tr></tbody></table>
+<h2>8.4 Compile-time errors (one per stage)</h2>
+<table><thead><tr><th>File in <code>examples/errors/</code></th><th>Diagnostic produced</th></tr></thead><tbody>
+<tr><td><code>invalid-token.cflow</code></td><td><code>Lexical error at line 4, column 5: Illegal character '@'</code></td></tr>
+<tr><td><code>missing-brace.cflow</code></td><td><code>Syntax error at line 7, column 1: Expected '}' to close a block but found end of input</code> (and a second for the workflow body)</td></tr>
+<tr><td><code>undefined-identifier.cflow</code></td><td><code>Semantic error at line 4, column 10: Undefined identifier 'temperature'</code></td></tr>
+<tr><td><code>invalid-type.cflow</code></td><td><code>Semantic error at line 6, column 10: Operator '+' expects operands of type 'number, number', but found 'boolean' and 'number'</code></td></tr></tbody></table>
+
+<h1 class="section">9. Testing &amp; Verification</h1>
+<p>Tests are written with Vitest and mirror the compiler stages. The full suite currently passes: <strong>10 test files, 131 tests</strong>, and the project type-checks with <code>tsc --noEmit</code>.</p>
+<table><thead><tr><th>Suite</th><th>Tests</th><th>Covers</th></tr></thead><tbody>
+<tr><td><code>tests/lexer</code></td><td>12</td><td>keywords, identifiers, numbers, strings, operators, invalid characters, malformed numbers, unterminated strings, line/column tracking</td></tr>
+<tr><td><code>tests/parser</code></td><td>16</td><td>workflows, declarations, when/otherwise, nesting, actions, precedence, parentheses, malformed braces/parentheses, missing expressions</td></tr>
+<tr><td><code>tests/symbols</code></td><td>6</td><td>insert, lookup, duplicates, scope isolation</td></tr>
+<tr><td><code>tests/semantic</code></td><td>22</td><td>undefined identifiers, duplicates, numeric/boolean/equality typing, rejected type combinations, workflow scope</td></tr>
+<tr><td><code>tests/ir</code></td><td>14</td><td>arithmetic, comparisons, conditional jumps, labels, calls, alerts, logs, multiple conditions</td></tr>
+<tr><td><code>tests/optimizer</code></td><td>20</td><td>each pass as input-IR &rarr; output-IR, folding edge cases (e.g. division by zero), unreachable and dead code, and unchanged execution semantics</td></tr>
+<tr><td><code>tests/runtime</code></td><td>14</td><td>true/false branches, multiple conditions, action dispatch, alerts, logs, missing input, type mismatch, division by zero</td></tr>
+<tr><td><code>tests/compiler</code></td><td>10</td><td>pipeline wiring and the required malformed programs</td></tr>
+<tr><td><code>tests/e2e</code></td><td>9</td><td>full source &rarr; trace regression for representative and malformed programs</td></tr>
+<tr><td><code>tests/web</code></td><td>8</td><td>browser UI rendering (jsdom)</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>131</strong></td><td></td></tr></tbody></table>
+
+<h1 class="section">10. Requirements Compliance, Limitations &amp; Future Work</h1>
+<h2>10.1 Definition of Done</h2>
+<table><thead><tr><th>Requirement</th><th>Status</th><th>Implemented in</th></tr></thead><tbody>
+<tr><td>Lexed, with location tracking</td><td>Done</td><td><code>src/lexer/</code></td></tr>
+<tr><td>Parsed by hand-written recursive descent; AST built</td><td>Done</td><td><code>src/parser/</code>, <code>src/ast/</code></td></tr>
+<tr><td>Semantically validated; symbol table populated</td><td>Done</td><td><code>src/semantic/</code>, <code>src/symbols/</code></td></tr>
+<tr><td>TAC generated as structured instructions</td><td>Done</td><td><code>src/ir/</code></td></tr>
+<tr><td>TAC optimized (fold, unreachable, dead code), before/after visible</td><td>Done</td><td><code>src/optimizer/</code>, UI panels</td></tr>
+<tr><td>Optimized TAC executed; trace produced</td><td>Done</td><td><code>src/runtime/</code></td></tr>
+<tr><td>Errors reported consistently by stage, with locations</td><td>Done</td><td><code>src/diagnostics/</code></td></tr>
+<tr><td>Artifacts visible in the UI</td><td>Done</td><td><code>web/</code></td></tr></tbody></table>
+<h2>10.2 Limitations</h2>
+<ul>
+<li>Constant-condition branches are not collapsed into unconditional jumps (Section 6.1).</li>
+<li>Constant folding is local between labels; constants are not propagated across merge points.</li>
+<li>Actions are simulated effects only; there are no user-defined actions, integrations or real sensors by design.</li>
+<li>Each workflow is compiled and executed independently, and all workflows receive the same input record.</li>
+<li>The browser UI is intentionally minimal and has no editor features such as inline error highlighting.</li></ul>
+<h2>10.3 Possible Future Work</h2>
+<ul><li>Rewrite constant-condition <code>IfFalse</code> into <code>Goto</code>/nothing for a fully collapsed IR.</li>
+<li>Per-instruction highlighting that links an IR line or trace entry back to its source line in the UI.</li>
+<li>A step-through execution view showing temporaries after each instruction.</li></ul>
+
+<h1 class="section">11. Conclusion</h1>
+<p>CodeFlow demonstrates a complete compiler pipeline for a small, domain-specific language. Phase 1 fixed the language, grammar and architecture and delivered the lexer, recursive-descent parser and AST. Phase 2 added the scoped symbol table, a type-checking semantic analyzer and a structured Three-Address Code generator. Phase 3 added constant folding, unreachable- and dead-code elimination, a TAC interpreter with runtime error handling, a complete Compiler Explorer, and end-to-end regression tests. Every transformation is real, consumed by the next stage, and inspectable: the optimizer's effect is visible as before/after IR, and execution runs on the optimized IR rather than on the source.</p>
+<footer class="pagefoot">CodeFlow &mdash; Final Report &mdash; Daksh Arora (24BCI0259) &mdash; Compiler Design Laboratory (BCSE307P)</footer>
+</body></html>
