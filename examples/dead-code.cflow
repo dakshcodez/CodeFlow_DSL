@@ -1,0 +1,15 @@
+workflow "DeadCodeDemo" {
+    sensor temperature : number
+
+    when temperature > 10 + 20 {
+        alert "High temperature"
+    }
+
+    when 5 > 3 {
+        log "Always runs"
+    }
+
+    when 2 > 9 {
+        action never_called()
+    }
+}
